@@ -414,6 +414,12 @@ export async function GET() {
           return;
         }
         
+        // Check if all games in this week are completed
+        const allGamesCompleted = games.every((g: any) => g.status.type.state === 'post');
+        if (!allGamesCompleted) {
+          console.log(`Week ${week} has incomplete games, skipping for best/worst calculation`);
+        }
+        
         let weekCorrect = 0;
         let weekTotal = 0;
         
@@ -432,7 +438,8 @@ export async function GET() {
           }
         });
         
-        if (weekTotal > 0) {
+        // Only include in weekResults if ALL games are completed
+        if (weekTotal > 0 && allGamesCompleted) {
           weekResults.push({ week, correct: weekCorrect, total: weekTotal });
         }
       });
