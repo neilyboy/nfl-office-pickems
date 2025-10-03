@@ -1,21 +1,13 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { getUserSession } from '@/lib/session';
 import { StandingsInterface } from '@/components/standings-interface';
 
 export default async function StandingsPage() {
-  const cookieStore = cookies();
-  const userCookie = cookieStore.get('user-session');
-
-  if (!userCookie) {
-    redirect('/');
+  const session = await getUserSession();
+  
+  if (!session) {
+    redirect('/login');
   }
 
-  let user;
-  try {
-    user = JSON.parse(userCookie.value);
-  } catch {
-    redirect('/');
-  }
-
-  return <StandingsInterface user={user} />;
+  return <StandingsInterface user={session} />;
 }
