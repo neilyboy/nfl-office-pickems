@@ -50,6 +50,7 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
   const [stats, setStats] = useState<UserStats[]>([]);
   const [season, setSeason] = useState(0);
   const [highlights, setHighlights] = useState<any>(null);
+  const [lunchTracker, setLunchTracker] = useState<any[]>([]);
 
   useEffect(() => {
     fetchStats();
@@ -67,6 +68,7 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
       setStats(data.stats || []);
       setSeason(data.season);
       setHighlights(data.highlights || null);
+      setLunchTracker(data.lunchTracker || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -353,15 +355,52 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                   🍔 Lunch Tracker
                 </CardTitle>
                 <CardDescription>
-                  Loser buys lunch! Track who's on the hook
+                  Who owes who lunch this season
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">
-                    Weekly lunch debts coming soon!
-                  </p>
-                </div>
+                {lunchTracker.length > 0 ? (
+                  <div className="space-y-2">
+                    {lunchTracker.map((tracker) => (
+                      <div key={tracker.userId} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-10 h-10" style={{ backgroundColor: tracker.avatarColor }}>
+                            <AvatarFallback style={{ backgroundColor: tracker.avatarColor, color: 'white' }}>
+                              {getInitials(tracker.firstName, tracker.lastName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{tracker.firstName} {tracker.lastName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {tracker.wins}W - {tracker.losses}L
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {tracker.net > 0 ? (
+                            <Badge variant="default" className="bg-green-500">
+                              +{tracker.net} 🍔
+                            </Badge>
+                          ) : tracker.net < 0 ? (
+                            <Badge variant="destructive">
+                              {tracker.net} 🍔
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">
+                              Even
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-muted-foreground">
+                      No completed weeks yet
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -105,6 +105,102 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
 }
 
 /**
+ * Calculate lunch tracker - who owes lunch based on weekly wins/losses
+ */
+function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<any, any>, isPickCorrect: Function) {
+  const weeklyResults = new Map<number, { winner: any; loser: any }>();
+  
+  // Get all unique weeks
+  const weeks = Array.from(new Set(allPicks.map(p => p.week))).sort((a, b) => a - b);
+  
+  weeks.forEach(week => {
+    const games = gamesByWeek.get(week);
+    if (!games) return;
+    
+    // Check if week is complete
+    const allCompleted = games.every((g: any) => g.status.type.state === 'post');
+    if (!allCompleted) return;
+    
+    // Calculate scores for each user
+    const userScores = new Map<number, { correct: number; total: number; user: any }>();
+    
+    users.forEach(user => {
+      userScores.set(user.id, { correct: 0, total: 0, user });
+    });
+    
+    allPicks.filter(p => p.week === week).forEach(pick => {
+      const result = isPickCorrect(pick, games);
+      const userScore = userScores.get(pick.userId);
+      if (!userScore) return;
+      
+      if (result === true) {
+        userScore.correct++;
+        userScore.total++;
+      } else if (result === false) {
+        userScore.total++;
+      }
+    });
+    
+    // Find winner and loser
+    const scoresArray = Array.from(userScores.values()).filter(s => s.total > 0);
+    if (scoresArray.length === 0) return;
+    
+    scoresArray.sort((a, b) => b.correct - a.correct);
+    
+    const winner = scoresArray[0];
+    const loser = scoresArray[scoresArray.length - 1];
+    
+    weeklyResults.set(week, {
+      winner: {
+        userId: winner.user.id,
+        username: winner.user.username,
+        firstName: winner.user.firstName,
+        lastName: winner.user.lastName,
+        avatarColor: winner.user.avatarColor,
+      },
+      loser: {
+        userId: loser.user.id,
+        username: loser.user.username,
+        firstName: loser.user.firstName,
+        lastName: loser.user.lastName,
+        avatarColor: loser.user.avatarColor,
+      },
+    });
+  });
+  
+  // Calculate net lunches for each user
+  const lunchDebts = new Map<number, { wins: number; losses: number; user: any }>();
+  
+  users.forEach(user => {
+    lunchDebts.set(user.id, { wins: 0, losses: 0, user });
+  });
+  
+  weeklyResults.forEach(result => {
+    const winnerDebt = lunchDebts.get(result.winner.userId);
+    const loserDebt = lunchDebts.get(result.loser.userId);
+    
+    if (winnerDebt) winnerDebt.wins++;
+    if (loserDebt) loserDebt.losses++;
+  });
+  
+  // Convert to array and sort by net lunches
+  const lunchArray = Array.from(lunchDebts.values())
+    .map(debt => ({
+      userId: debt.user.id,
+      username: debt.user.username,
+      firstName: debt.user.firstName,
+      lastName: debt.user.lastName,
+      avatarColor: debt.user.avatarColor,
+      wins: debt.wins,
+      losses: debt.losses,
+      net: debt.wins - debt.losses,
+    }))
+    .sort((a, b) => b.net - a.net);
+  
+  return lunchArray;
+}
+
+/**
  * GET - Get season statistics for all users
  */
 export async function GET() {
@@ -278,10 +374,14 @@ export async function GET() {
     // Calculate season highlights
     const highlights = calculateSeasonHighlights(users, allPicks, gamesByWeek, isPickCorrect);
 
+    // Calculate lunch tracker (weekly wins/losses)
+    const lunchTracker = calculateLunchTracker(users, allPicks, gamesByWeek, isPickCorrect);
+
     return NextResponse.json({
       season,
       stats,
       highlights,
+      lunchTracker,
     });
   } catch (error) {
     console.error('Get stats error:', error);
