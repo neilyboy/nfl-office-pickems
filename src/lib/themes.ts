@@ -628,20 +628,59 @@ export function getTheme(themeId: string): Theme {
   return ALL_THEMES[themeId] || BASE_THEMES.dark;
 }
 
+// Convert hex color to HSL format that Tailwind expects (without hsl() wrapper)
+function hexToHSL(hex: string): string {
+  // Remove # if present
+  hex = hex.replace(/^#/, '');
+  
+  // Parse hex values
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  
+  h = Math.round(h * 360);
+  s = Math.round(s * 100);
+  l = Math.round(l * 100);
+  
+  return `${h} ${s}% ${l}%`;
+}
+
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   
-  // Apply CSS variables
-  root.style.setProperty('--primary', theme.colors.primary);
-  root.style.setProperty('--secondary', theme.colors.secondary);
-  root.style.setProperty('--accent', theme.colors.accent);
-  root.style.setProperty('--background', theme.colors.background);
-  root.style.setProperty('--foreground', theme.colors.foreground);
-  root.style.setProperty('--card', theme.colors.card);
-  root.style.setProperty('--card-foreground', theme.colors.cardForeground);
-  root.style.setProperty('--muted', theme.colors.muted);
-  root.style.setProperty('--muted-foreground', theme.colors.mutedForeground);
-  root.style.setProperty('--border', theme.colors.border);
+  // Convert and apply CSS variables in HSL format
+  root.style.setProperty('--primary', hexToHSL(theme.colors.primary));
+  root.style.setProperty('--primary-foreground', hexToHSL(theme.colors.foreground));
+  root.style.setProperty('--secondary', hexToHSL(theme.colors.secondary));
+  root.style.setProperty('--secondary-foreground', hexToHSL(theme.colors.foreground));
+  root.style.setProperty('--accent', hexToHSL(theme.colors.accent));
+  root.style.setProperty('--accent-foreground', hexToHSL(theme.colors.foreground));
+  root.style.setProperty('--background', hexToHSL(theme.colors.background));
+  root.style.setProperty('--foreground', hexToHSL(theme.colors.foreground));
+  root.style.setProperty('--card', hexToHSL(theme.colors.card));
+  root.style.setProperty('--card-foreground', hexToHSL(theme.colors.cardForeground));
+  root.style.setProperty('--muted', hexToHSL(theme.colors.muted));
+  root.style.setProperty('--muted-foreground', hexToHSL(theme.colors.mutedForeground));
+  root.style.setProperty('--border', hexToHSL(theme.colors.border));
+  root.style.setProperty('--input', hexToHSL(theme.colors.muted));
+  root.style.setProperty('--ring', hexToHSL(theme.colors.primary));
+  root.style.setProperty('--popover', hexToHSL(theme.colors.card));
+  root.style.setProperty('--popover-foreground', hexToHSL(theme.colors.cardForeground));
   
   // Update class for light mode
   if (theme.id === 'light') {
