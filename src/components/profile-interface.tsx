@@ -21,6 +21,7 @@ import {
 import { getInitials } from '@/lib/utils';
 import { BadgeDisplay } from '@/components/badge-display';
 import { calculateUserBadges } from '@/lib/badges';
+import { ThemeSelector } from '@/components/theme-selector';
 
 interface ProfileInterfaceProps {
   user: {
@@ -523,6 +524,11 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Theme Customization */}
+          <div className="lg:col-span-2">
+            <ThemeSelector />
+          </div>
         </div>
       </main>
     </div>

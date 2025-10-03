@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InstallPrompt } from "@/components/install-prompt";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,9 +53,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
       </head>
       <body className={inter.className}>
-        {children}
-        <Toaster />
-        <InstallPrompt />
+        <ThemeProvider>
+          {children}
+          <Toaster />
+          <InstallPrompt />
+        </ThemeProvider>
       </body>
     </html>
   );
