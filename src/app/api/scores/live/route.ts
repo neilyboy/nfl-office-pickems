@@ -119,6 +119,8 @@ export async function GET() {
         firstName: user.firstName,
         lastName: user.lastName,
         avatarColor: user.avatarColor,
+        avatarType: user.avatarType,
+        avatarValue: user.avatarValue,
         correct,
         incorrect,
         remaining,

@@ -10,13 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { 
   ArrowLeft, 
-  ChevronLeft,
   ChevronRight,
+  ChevronLeft,
   Edit,
   Check,
   X
 } from 'lucide-react';
-import { getInitials, getDayOfWeek } from '@/lib/utils';
+import { getDayOfWeek } from '@/lib/utils';
+import { UserAvatar } from '@/components/user-avatar';
 import { ESPNGame } from '@/lib/espn-api';
 import { getTeamLogoPath } from '@/lib/team-mappings';
 import Image from 'next/image';
@@ -27,6 +28,8 @@ interface UserPick {
   firstName: string;
   lastName: string;
   avatarColor: string;
+  avatarType?: string;
+  avatarValue?: string | null;
   picks: Array<{
     gameId: string;
     pickedTeamId: string;
@@ -270,11 +273,14 @@ export function AdminPicksManagement() {
                     } ${editingUser !== null ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-8 h-8" style={{ backgroundColor: user.avatarColor }}>
-                        <AvatarFallback style={{ backgroundColor: user.avatarColor, color: 'white' }}>
-                          {getInitials(user.firstName, user.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        firstName={user.firstName}
+                        lastName={user.lastName}
+                        avatarType={user.avatarType}
+                        avatarValue={user.avatarValue}
+                        avatarColor={user.avatarColor}
+                        size="sm"
+                      />
                       <div className="text-left flex-1 min-w-0">
                         <p className="font-semibold truncate text-sm">
                           {user.firstName} {user.lastName}
@@ -302,11 +308,14 @@ export function AdminPicksManagement() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-12 h-12" style={{ backgroundColor: selectedUserData.avatarColor }}>
-                        <AvatarFallback style={{ backgroundColor: selectedUserData.avatarColor, color: 'white' }}>
-                          {getInitials(selectedUserData.firstName, selectedUserData.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        firstName={selectedUserData.firstName}
+                        lastName={selectedUserData.lastName}
+                        avatarType={selectedUserData.avatarType}
+                        avatarValue={selectedUserData.avatarValue}
+                        avatarColor={selectedUserData.avatarColor}
+                        size="lg"
+                      />
                       <div>
                         <CardTitle>{selectedUserData.firstName} {selectedUserData.lastName}</CardTitle>
                         <CardDescription>@{selectedUserData.username}</CardDescription>

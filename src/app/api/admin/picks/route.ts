@@ -39,6 +39,8 @@ export async function GET(request: Request) {
         firstName: true,
         lastName: true,
         avatarColor: true,
+        avatarType: true,
+        avatarValue: true,
       },
       orderBy: { firstName: 'asc' },
     });
