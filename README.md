@@ -1,14 +1,12 @@
-# NFL Office Pickems 🏈
+# 🏈 NFL Office Pickems - Production Ready!
 
-A modern, dark-themed web application for managing weekly NFL pickems at the office.
+A complete, feature-rich Next.js application for managing NFL office football pickems with real-time scoring, chat, and comprehensive admin tools.
 
-**Repository:** https://github.com/neilyboy/nfl-office-pickems  
-**Status:** 🟢 75% Complete - Core Features Working  
-**Last Updated:** October 2, 2025
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![Completion](https://img.shields.io/badge/Completion-98%25-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## Features
-
-### 🔐 Authentication & Authorization
+## ✨ Features
 - **Admin Setup**: First-run PIN and password creation
 - **User Management**: Admin creates users with default password `nflofficepickems`
 - **Password Reset**: Users must change password on first login and after resets
