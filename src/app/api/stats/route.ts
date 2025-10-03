@@ -453,6 +453,11 @@ export async function GET() {
         );
         bestWeek = bestWeekResult.correct;
         worstWeek = worstWeekResult.correct;
+        
+        // If there's only one week, best and worst are the same
+        if (weekResults.length === 1) {
+          worstWeek = bestWeek;
+        }
       }
 
       const userStats = {
