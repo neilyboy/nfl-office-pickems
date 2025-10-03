@@ -30,6 +30,7 @@ interface PicksInterfaceProps {
     username: string;
     firstName: string;
     lastName: string;
+    isAdmin?: boolean;
   };
 }
 
@@ -351,6 +352,11 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
                   <Lock className="w-4 h-4" />
                   Locked
                 </Badge>
+              )}
+              {user.isAdmin && (
+                <Button variant="default" size="sm" onClick={() => router.push('/admin')}>
+                  ⚙️ Admin
+                </Button>
               )}
               <Button variant="outline" size="sm" onClick={() => router.push('/scores')}>
                 📊 Scores
