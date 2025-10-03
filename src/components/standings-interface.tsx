@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { getInitials } from '@/lib/utils';
+import { UserAvatar } from '@/components/user-avatar';
 
 interface StandingsInterfaceProps {
   user: {
@@ -230,11 +230,14 @@ export function StandingsInterface({ user }: StandingsInterfaceProps) {
                   <CardContent>
                     {selectedResult.winner ? (
                       <div className="flex items-center gap-4">
-                        <Avatar className="w-16 h-16" style={{ backgroundColor: selectedResult.winner.avatarColor }}>
-                          <AvatarFallback style={{ backgroundColor: selectedResult.winner.avatarColor, color: 'white' }}>
-                            {getInitials(selectedResult.winner.firstName, selectedResult.winner.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          firstName={selectedResult.winner.firstName}
+                          lastName={selectedResult.winner.lastName}
+                          avatarType={selectedResult.winner.avatarType}
+                          avatarValue={selectedResult.winner.avatarValue}
+                          avatarColor={selectedResult.winner.avatarColor}
+                          size="xl"
+                        />
                         <div className="flex-1">
                           <p className="text-2xl font-bold">
                             {selectedResult.winner.firstName} {selectedResult.winner.lastName}
@@ -269,11 +272,14 @@ export function StandingsInterface({ user }: StandingsInterfaceProps) {
                   <CardContent>
                     {selectedResult.loser ? (
                       <div className="flex items-center gap-4">
-                        <Avatar className="w-16 h-16" style={{ backgroundColor: selectedResult.loser.avatarColor }}>
-                          <AvatarFallback style={{ backgroundColor: selectedResult.loser.avatarColor, color: 'white' }}>
-                            {getInitials(selectedResult.loser.firstName, selectedResult.loser.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          firstName={selectedResult.loser.firstName}
+                          lastName={selectedResult.loser.lastName}
+                          avatarType={selectedResult.loser.avatarType}
+                          avatarValue={selectedResult.loser.avatarValue}
+                          avatarColor={selectedResult.loser.avatarColor}
+                          size="xl"
+                        />
                         <div className="flex-1">
                           <p className="text-2xl font-bold">
                             {selectedResult.loser.firstName} {selectedResult.loser.lastName}
@@ -313,11 +319,14 @@ export function StandingsInterface({ user }: StandingsInterfaceProps) {
                           <p className="text-sm font-semibold text-green-500 mb-2">Closest Guess</p>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Avatar className="w-8 h-8" style={{ backgroundColor: selectedResult.tiebreaker.winner.avatarColor }}>
-                                <AvatarFallback style={{ backgroundColor: selectedResult.tiebreaker.winner.avatarColor, color: 'white', fontSize: '12px' }}>
-                                  {getInitials(selectedResult.tiebreaker.winner.firstName, selectedResult.tiebreaker.winner.lastName)}
-                                </AvatarFallback>
-                              </Avatar>
+                              <UserAvatar
+                                firstName={selectedResult.tiebreaker.winner.firstName}
+                                lastName={selectedResult.tiebreaker.winner.lastName}
+                                avatarType={selectedResult.tiebreaker.winner.avatarType}
+                                avatarValue={selectedResult.tiebreaker.winner.avatarValue}
+                                avatarColor={selectedResult.tiebreaker.winner.avatarColor}
+                                size="sm"
+                              />
                               <span className="font-semibold">
                                 {selectedResult.tiebreaker.winner.firstName} {selectedResult.tiebreaker.winner.lastName}
                               </span>
@@ -337,11 +346,14 @@ export function StandingsInterface({ user }: StandingsInterfaceProps) {
                           <p className="text-sm font-semibold text-red-500 mb-2">Farthest Guess</p>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Avatar className="w-8 h-8" style={{ backgroundColor: selectedResult.tiebreaker.loser.avatarColor }}>
-                                <AvatarFallback style={{ backgroundColor: selectedResult.tiebreaker.loser.avatarColor, color: 'white', fontSize: '12px' }}>
-                                  {getInitials(selectedResult.tiebreaker.loser.firstName, selectedResult.tiebreaker.loser.lastName)}
-                                </AvatarFallback>
-                              </Avatar>
+                              <UserAvatar
+                                firstName={selectedResult.tiebreaker.loser.firstName}
+                                lastName={selectedResult.tiebreaker.loser.lastName}
+                                avatarType={selectedResult.tiebreaker.loser.avatarType}
+                                avatarValue={selectedResult.tiebreaker.loser.avatarValue}
+                                avatarColor={selectedResult.tiebreaker.loser.avatarColor}
+                                size="sm"
+                              />
                               <span className="font-semibold">
                                 {selectedResult.tiebreaker.loser.firstName} {selectedResult.tiebreaker.loser.lastName}
                               </span>
@@ -388,11 +400,14 @@ export function StandingsInterface({ user }: StandingsInterfaceProps) {
                         return (
                           <div key={userId} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
                             <div className="flex items-center gap-3">
-                              <Avatar className="w-10 h-10" style={{ backgroundColor: userInfo.avatarColor }}>
-                                <AvatarFallback style={{ backgroundColor: userInfo.avatarColor, color: 'white' }}>
-                                  {getInitials(userInfo.firstName, userInfo.lastName)}
-                                </AvatarFallback>
-                              </Avatar>
+                              <UserAvatar
+                                firstName={userInfo.firstName}
+                                lastName={userInfo.lastName}
+                                avatarType={userInfo.avatarType}
+                                avatarValue={userInfo.avatarValue}
+                                avatarColor={userInfo.avatarColor}
+                                size="md"
+                              />
                               <div>
                                 <p className="font-semibold">{userInfo.firstName} {userInfo.lastName}</p>
                                 <p className="text-xs text-muted-foreground">
