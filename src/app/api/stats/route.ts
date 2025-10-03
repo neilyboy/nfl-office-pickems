@@ -105,6 +105,118 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
 }
 
 /**
+ * Calculate advanced analytics - streaks, trends, records
+ */
+function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: Map<any, any>, isPickCorrect: Function) {
+  const userAnalytics = users.map(user => {
+    const userPicks = allPicks.filter(p => p.userId === user.id);
+    const weeks = Array.from(new Set(userPicks.map(p => p.week))).sort((a, b) => a - b);
+    
+    // Calculate current streak
+    let currentStreak = 0;
+    let streakType: 'win' | 'loss' | null = null;
+    
+    // Calculate week by week performance
+    const weeklyPerformance = weeks.map(week => {
+      const weekPicks = userPicks.filter(p => p.week === week);
+      const games = gamesByWeek.get(week);
+      if (!games) return { week, correct: 0, total: 0 };
+      
+      let correct = 0;
+      let total = 0;
+      
+      weekPicks.forEach(pick => {
+        const result = isPickCorrect(pick, games);
+        if (result === true) {
+          correct++;
+          total++;
+        } else if (result === false) {
+          total++;
+        }
+      });
+      
+      return { week, correct, total };
+    });
+    
+    // Calculate streak from most recent games (in reverse chronological order)
+    const recentPicks = [...userPicks]
+      .sort((a, b) => b.week - a.week)
+      .slice(0, 20); // Last 20 picks
+    
+    for (const pick of recentPicks) {
+      const games = gamesByWeek.get(pick.week);
+      if (!games) continue;
+      
+      const result = isPickCorrect(pick, games);
+      if (result === null) continue; // Skip unfinished games
+      
+      if (currentStreak === 0) {
+        // Start streak
+        streakType = result ? 'win' : 'loss';
+        currentStreak = 1;
+      } else if ((streakType === 'win' && result) || (streakType === 'loss' && !result)) {
+        // Continue streak
+        currentStreak++;
+      } else {
+        // Streak broken
+        break;
+      }
+    }
+    
+    // Find best and worst streaks
+    let bestStreak = 0;
+    let worstStreak = 0;
+    let tempStreak = 0;
+    let tempType: 'win' | 'loss' | null = null;
+    
+    userPicks.forEach(pick => {
+      const games = gamesByWeek.get(pick.week);
+      if (!games) return;
+      
+      const result = isPickCorrect(pick, games);
+      if (result === null) return;
+      
+      if (tempStreak === 0) {
+        tempType = result ? 'win' : 'loss';
+        tempStreak = 1;
+      } else if ((tempType === 'win' && result) || (tempType === 'loss' && !result)) {
+        tempStreak++;
+      } else {
+        if (tempType === 'win' && tempStreak > bestStreak) {
+          bestStreak = tempStreak;
+        } else if (tempType === 'loss' && tempStreak > worstStreak) {
+          worstStreak = tempStreak;
+        }
+        tempType = result ? 'win' : 'loss';
+        tempStreak = 1;
+      }
+    });
+    
+    // Check final streak
+    if (tempType === 'win' && tempStreak > bestStreak) {
+      bestStreak = tempStreak;
+    } else if (tempType === 'loss' && tempStreak > worstStreak) {
+      worstStreak = tempStreak;
+    }
+    
+    return {
+      userId: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarColor: user.avatarColor,
+      currentStreak,
+      streakType,
+      bestStreak,
+      worstStreak,
+      weeklyPerformance,
+    };
+  });
+  
+  return userAnalytics;
+}
+
+/**
  * Calculate lunch tracker - who owes lunch based on weekly wins/losses
  */
 function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<any, any>, isPickCorrect: Function) {
@@ -377,11 +489,15 @@ export async function GET() {
     // Calculate lunch tracker (weekly wins/losses)
     const lunchTracker = calculateLunchTracker(users, allPicks, gamesByWeek, isPickCorrect);
 
+    // Calculate advanced analytics
+    const analytics = calculateAdvancedAnalytics(users, allPicks, gamesByWeek, isPickCorrect);
+
     return NextResponse.json({
       season,
       stats,
       highlights,
       lunchTracker,
+      analytics,
     });
   } catch (error) {
     console.error('Get stats error:', error);
