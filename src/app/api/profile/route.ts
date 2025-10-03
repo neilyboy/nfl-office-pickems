@@ -49,12 +49,14 @@ export async function PATCH(request: Request) {
     }
 
     const data = await request.json();
-    const { avatarColor } = data;
+    const { avatarColor, avatarType, avatarValue } = data;
 
     const updatedUser = await prisma.user.update({
       where: { id: session.userId },
       data: {
         ...(avatarColor && { avatarColor }),
+        ...(avatarType && { avatarType }),
+        ...(avatarValue !== undefined && { avatarValue }),
       },
       select: {
         id: true,

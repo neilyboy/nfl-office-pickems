@@ -44,6 +44,24 @@ const AVATAR_COLORS = [
   '#EC4899', // pink
 ];
 
+const AVATAR_EMOJIS = [
+  // Sports & Activities
+  '🏈', '⚽', '🏀', '⚾', '🎾', '🏐', '🏉', '🥎', '🏏', '🏒',
+  // Animals
+  '🦅', '🐻', '🐯', '🦁', '🐺', '🦊', '🐴', '🦌', '🐆', '🐊',
+  // Faces & Expressions  
+  '😎', '🤠', '🥳', '🤩', '😤', '🤯', '😈', '👽', '🤖', '👻',
+  // Symbols & Objects
+  '🔥', '⚡', '💪', '👑', '🎯', '🎪', '🎲', '🎰', '🏆', '🥇',
+  // Nature & Weather
+  '⭐', '💫', '🌟', '✨', '☀️', '🌙', '⚡', '🌈', '🔱', '💎',
+];
+
+const AVATAR_TYPE_LABELS = {
+  initials: 'Initials with Color',
+  emoji: 'Emoji Avatar',
+};
+
 export function ProfileInterface({ user }: ProfileInterfaceProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -52,6 +70,8 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
   const [userData, setUserData] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [selectedColor, setSelectedColor] = useState('');
+  const [avatarType, setAvatarType] = useState<'initials' | 'emoji'>('initials');
+  const [selectedEmoji, setSelectedEmoji] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -76,6 +96,8 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
 
       setUserData(userData);
       setSelectedColor(userData.avatarColor || AVATAR_COLORS[0]);
+      setAvatarType(userData.avatarType || 'initials');
+      setSelectedEmoji(userData.avatarValue || '🏈');
       
       // Find current user's stats
       const userStats = statsData.stats?.find((s: any) => s.userId === user.userId);
@@ -91,24 +113,32 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
     }
   };
 
-  const handleUpdateColor = async () => {
-    if (!selectedColor || selectedColor === userData.avatarColor) return;
+  const handleUpdateAvatar = async () => {
+    const hasChanges = 
+      (avatarType === 'initials' && selectedColor !== userData.avatarColor) ||
+      (avatarType === 'emoji' && (selectedEmoji !== userData.avatarValue || avatarType !== userData.avatarType));
+    
+    if (!hasChanges) return;
 
     setSaving(true);
     try {
       const response = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ avatarColor: selectedColor }),
+        body: JSON.stringify({ 
+          avatarType,
+          avatarValue: avatarType === 'emoji' ? selectedEmoji : null,
+          avatarColor: selectedColor,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update color');
+        throw new Error('Failed to update avatar');
       }
 
       toast({
-        title: 'Color Updated! 🎨',
-        description: 'Your avatar color has been updated',
+        title: 'Avatar Updated! 🎨',
+        description: 'Your avatar has been changed',
       });
 
       await fetchProfile();
@@ -320,39 +350,82 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
             </Card>
           )}
 
-          {/* Avatar Color */}
+          {/* Avatar Selection */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Palette className="w-5 h-5" />
-                Avatar Color
+                Avatar Customization
               </CardTitle>
               <CardDescription>
-                Choose your avatar color
+                Choose initials with color or emoji avatar
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-6 gap-2">
-                {AVATAR_COLORS.map(color => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`w-12 h-12 rounded-lg transition-all ${
-                      selectedColor === color
-                        ? 'ring-4 ring-primary scale-110'
-                        : 'hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
+              {/* Avatar Type Tabs */}
+              <div className="flex gap-2">
+                <Button
+                  variant={avatarType === 'initials' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setAvatarType('initials')}
+                  className="flex-1"
+                >
+                  🎨 Color
+                </Button>
+                <Button
+                  variant={avatarType === 'emoji' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setAvatarType('emoji')}
+                  className="flex-1"
+                >
+                  😀 Emoji
+                </Button>
               </div>
+
+              {/* Color Selection */}
+              {avatarType === 'initials' && (
+                <div className="grid grid-cols-6 gap-2">
+                  {AVATAR_COLORS.map(color => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`w-12 h-12 rounded-lg transition-all ${
+                        selectedColor === color
+                          ? 'ring-4 ring-primary scale-110'
+                          : 'hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Emoji Selection */}
+              {avatarType === 'emoji' && (
+                <div className="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+                  {AVATAR_EMOJIS.map(emoji => (
+                    <button
+                      key={emoji}
+                      onClick={() => setSelectedEmoji(emoji)}
+                      className={`w-12 h-12 text-2xl rounded-lg transition-all ${
+                        selectedEmoji === emoji
+                          ? 'ring-4 ring-primary scale-110 bg-primary/10'
+                          : 'hover:scale-105 hover:bg-secondary/50'
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <Button
-                onClick={handleUpdateColor}
-                disabled={saving || selectedColor === userData?.avatarColor}
+                onClick={handleUpdateAvatar}
+                disabled={saving}
                 className="w-full"
               >
                 <Save className="w-4 h-4 mr-2" />
-                Update Color
+                Update Avatar
               </Button>
             </CardContent>
           </Card>
