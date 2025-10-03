@@ -102,9 +102,10 @@ export function calculateUserBadges(analytics: any, allAnalytics: any[]): Earned
 
   if (!analytics) return earnedBadges;
 
-  // 1. Perfect Week - Check if user has any perfect weeks
+  // 1. Perfect Week - Check if user has any perfect weeks (completed weeks only)
+  // Only count weeks with 10+ games as complete (full NFL week)
   const perfectWeeks = analytics.weeklyPerformance?.filter((w: any) => 
-    w.total > 0 && w.correct === w.total
+    w.total >= 10 && w.correct === w.total
   ) || [];
   if (perfectWeeks.length > 0) {
     earnedBadges.push({

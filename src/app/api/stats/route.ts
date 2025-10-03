@@ -295,7 +295,7 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
       ? Math.max(...correctCounts) - Math.min(...correctCounts)
       : 0;
     
-    // Calculate Clutch Factor (Monday night accuracy)
+    // Calculate Clutch Factor (Monday night accuracy - CORRECT guesses only)
     const mondayPicks = userPicks.filter(p => p.mondayNightGuess !== null);
     let clutchFactorCount = 0;
     mondayPicks.forEach(pick => {
@@ -304,9 +304,24 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
       
       // Check if week is complete
       const allCompleted = games.every((g: any) => g.status.type.state === 'post');
-      if (allCompleted) clutchFactorCount++;
+      if (!allCompleted) return;
+      
+      // Calculate actual total score for the week
+      let actualTotal = 0;
+      games.forEach((game: any) => {
+        const homeTeam = game.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
+        const awayTeam = game.competitions[0].competitors.find((c: any) => c.homeAway === 'away');
+        if (homeTeam && awayTeam) {
+          actualTotal += parseInt(homeTeam.score || '0') + parseInt(awayTeam.score || '0');
+        }
+      });
+      
+      // Check if guess was exactly correct
+      if (pick.mondayNightGuess === actualTotal) {
+        clutchFactorCount++;
+      }
     });
-    const clutchFactor = mondayPicks.length > 0 ? clutchFactorCount : 0;
+    const clutchFactor = clutchFactorCount;
     
     return {
       userId: user.id,
