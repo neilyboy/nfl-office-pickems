@@ -110,6 +110,55 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
 }
 
 /**
+ * Calculate current week hot streak
+ */
+function calculateCurrentWeekProgress(users: any[], allPicks: any[], currentWeek: number, gamesByWeek: Map<any, any>, isPickCorrect: Function) {
+  return users.map(user => {
+    const userPicks = allPicks.filter(p => p.userId === user.id && p.week === currentWeek);
+    const games = gamesByWeek.get(currentWeek);
+    
+    if (!games || userPicks.length === 0) {
+      return {
+        userId: user.id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatarColor: user.avatarColor,
+        currentWeekCorrect: 0,
+        currentWeekTotal: 0,
+        currentWeekFinished: 0,
+        isHotStreak: false,
+      };
+    }
+    
+    let correct = 0;
+    let finished = 0;
+    
+    userPicks.forEach(pick => {
+      const result = isPickCorrect(pick, games);
+      if (result === true) {
+        correct++;
+        finished++;
+      } else if (result === false) {
+        finished++;
+      }
+    });
+    
+    return {
+      userId: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarColor: user.avatarColor,
+      currentWeekCorrect: correct,
+      currentWeekTotal: userPicks.length,
+      currentWeekFinished: finished,
+      isHotStreak: finished > 0 && correct === finished, // Perfect so far!
+    };
+  });
+}
+
+/**
  * Calculate advanced analytics - streaks, trends, records
  */
 function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: Map<any, any>, isPickCorrect: Function) {
@@ -327,7 +376,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { season } = await getCurrentWeek();
+    const { week: currentWeek, season } = await getCurrentWeek();
 
     // Get all users
     const users = await prisma.user.findMany({
@@ -509,12 +558,17 @@ export async function GET() {
     // Calculate advanced analytics
     const analytics = calculateAdvancedAnalytics(users, allPicks, gamesByWeek, isPickCorrect);
 
+    // Calculate current week hot streaks
+    const currentWeekProgress = calculateCurrentWeekProgress(users, allPicks, currentWeek, gamesByWeek, isPickCorrect);
+
     return NextResponse.json({
       season,
+      currentWeek,
       stats,
       highlights,
       lunchTracker,
       analytics,
+      currentWeekProgress,
     });
   } catch (error) {
     console.error('Get stats error:', error);

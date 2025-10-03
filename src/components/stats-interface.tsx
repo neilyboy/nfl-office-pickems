@@ -49,8 +49,11 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<UserStats[]>([]);
   const [season, setSeason] = useState(0);
+  const [currentWeek, setCurrentWeek] = useState(0);
   const [highlights, setHighlights] = useState<any>(null);
   const [lunchTracker, setLunchTracker] = useState<any[]>([]);
+  const [currentWeekProgress, setCurrentWeekProgress] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any[]>([]);
 
   useEffect(() => {
     fetchStats();
@@ -67,8 +70,11 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
 
       setStats(data.stats || []);
       setSeason(data.season);
+      setCurrentWeek(data.currentWeek || 0);
       setHighlights(data.highlights || null);
       setLunchTracker(data.lunchTracker || []);
+      setCurrentWeekProgress(data.currentWeekProgress || []);
+      setAnalytics(data.analytics || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -190,6 +196,48 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                   </div>
                   <p className="text-sm text-muted-foreground">Best Week</p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Hot Streaks - Current Week Progress */}
+        {currentWeekProgress.length > 0 && (
+          <Card className="mb-8 border-orange-500/50 bg-gradient-to-r from-orange-500/5 to-red-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                🔥 Week {currentWeek} Hot Streaks
+              </CardTitle>
+              <CardDescription>Who's on fire this week?</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {currentWeekProgress
+                  .filter(p => p.isHotStreak && p.currentWeekFinished > 0)
+                  .sort((a, b) => b.currentWeekFinished - a.currentWeekFinished)
+                  .map((progress) => (
+                    <div
+                      key={progress.userId}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-orange-500/10 border-2 border-orange-500/30"
+                    >
+                      <Avatar className="w-10 h-10" style={{ backgroundColor: progress.avatarColor }}>
+                        <AvatarFallback style={{ backgroundColor: progress.avatarColor, color: 'white' }}>
+                          {getInitials(progress.firstName, progress.lastName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold">{progress.firstName} {progress.lastName}</p>
+                        <p className="text-sm text-orange-500 font-bold">
+                          🔥 {progress.currentWeekCorrect}/{progress.currentWeekFinished} Perfect!
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                {currentWeekProgress.filter(p => p.isHotStreak && p.currentWeekFinished > 0).length === 0 && (
+                  <div className="col-span-full text-center py-4 text-muted-foreground">
+                    No perfect streaks yet this week
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
