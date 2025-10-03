@@ -19,7 +19,6 @@ export async function GET() {
         username: true,
         firstName: true,
         lastName: true,
-        email: true,
         avatarColor: true,
         createdAt: true,
       },
@@ -62,7 +61,6 @@ export async function PATCH(request: Request) {
         username: true,
         firstName: true,
         lastName: true,
-        email: true,
         avatarColor: true,
       },
     });

@@ -37,6 +37,9 @@ export function AdminDashboard() {
       const statsData = await statsResponse.json();
       const standingsData = await standingsResponse.json();
 
+      console.log('Admin Stats Data:', statsData);
+      console.log('Admin Standings Data:', standingsData);
+
       // Count total users
       const totalUsers = statsData.stats?.length || 0;
 
@@ -50,12 +53,15 @@ export function AdminDashboard() {
         });
       }
 
-      setStats({
+      const newStats = {
         totalUsers,
         currentWeek: standingsData.currentWeek || 5,
         season: standingsData.season || 2025,
         lunchesOwed,
-      });
+      };
+
+      console.log('Setting admin stats to:', newStats);
+      setStats(newStats);
     } catch (error) {
       console.error('Failed to fetch admin stats:', error);
     }

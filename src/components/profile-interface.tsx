@@ -205,7 +205,7 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -215,25 +215,28 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">My Profile</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-xl lg:text-2xl font-bold">My Profile</h1>
+                <p className="text-xs lg:text-sm text-muted-foreground">
                   {user.firstName} {user.lastName}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap w-full lg:w-auto">
               <Button variant="outline" size="sm" onClick={() => router.push('/picks')}>
-                🏈 Picks
+                <span className="sm:hidden">🏈</span>
+                <span className="hidden sm:inline">🏈 Picks</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/scores')}>
-                📊 Scores
+                <span className="sm:hidden">📊</span>
+                <span className="hidden sm:inline">📊 Scores</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/standings')}>
-                🏆 Standings
+                <span className="sm:hidden">🏆</span>
+                <span className="hidden sm:inline">🏆 Standings</span>
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">Logout</span>
               </Button>
             </div>
           </div>
