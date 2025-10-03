@@ -1,0 +1,12 @@
+services:
+  nfl-pickems:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/nfl-pickems.db
+      - TZ=America/Chicago
+    restart: unless-stopped
