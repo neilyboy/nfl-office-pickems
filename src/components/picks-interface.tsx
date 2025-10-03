@@ -364,6 +364,9 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
               <Button variant="outline" size="sm" onClick={() => router.push('/stats')}>
                 📈 Stats
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/profile')}>
+                👤 Profile
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout

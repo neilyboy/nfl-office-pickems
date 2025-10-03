@@ -199,6 +199,9 @@ export function LiveScores({ user }: LiveScoresProps) {
               <Button variant="outline" size="sm" onClick={() => router.push('/stats')}>
                 📈 Stats
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/profile')}>
+                👤 Profile
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
