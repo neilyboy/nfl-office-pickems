@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,50 @@ import {
 
 export function AdminDashboard() {
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    currentWeek: 5,
+    season: 2025,
+    lunchesOwed: 0,
+  });
+
+  useEffect(() => {
+    fetchAdminStats();
+  }, []);
+
+  const fetchAdminStats = async () => {
+    try {
+      const [statsResponse, standingsResponse] = await Promise.all([
+        fetch('/api/stats'),
+        fetch('/api/standings'),
+      ]);
+
+      const statsData = await statsResponse.json();
+      const standingsData = await standingsResponse.json();
+
+      // Count total users
+      const totalUsers = statsData.stats?.length || 0;
+
+      // Calculate total lunches owed
+      let lunchesOwed = 0;
+      if (statsData.lunchTracker) {
+        statsData.lunchTracker.forEach((tracker: any) => {
+          if (tracker.net < 0) {
+            lunchesOwed += Math.abs(tracker.net);
+          }
+        });
+      }
+
+      setStats({
+        totalUsers,
+        currentWeek: standingsData.currentWeek || 5,
+        season: standingsData.season || 2025,
+        lunchesOwed,
+      });
+    } catch (error) {
+      console.error('Failed to fetch admin stats:', error);
+    }
+  };
 
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
@@ -130,7 +175,7 @@ export function AdminDashboard() {
             ))}
           </div>
 
-          {/* Quick Stats - Placeholder */}
+          {/* Quick Stats */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader className="pb-3">
@@ -139,8 +184,10 @@ export function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground mt-1">No users yet</p>
+                <div className="text-3xl font-bold">{stats.totalUsers}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.totalUsers === 0 ? 'No users yet' : 'Active users'}
+                </p>
               </CardContent>
             </Card>
             <Card>
@@ -150,8 +197,8 @@ export function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">Week 5</div>
-                <p className="text-xs text-muted-foreground mt-1">2025 Season</p>
+                <div className="text-3xl font-bold">Week {stats.currentWeek}</div>
+                <p className="text-xs text-muted-foreground mt-1">{stats.season} Season</p>
               </CardContent>
             </Card>
             <Card>
@@ -161,8 +208,10 @@ export function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground mt-1">All paid up! 🍔</p>
+                <div className="text-3xl font-bold">{stats.lunchesOwed}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.lunchesOwed === 0 ? 'All paid up! 🍔' : 'Total debts'}
+                </p>
               </CardContent>
             </Card>
           </div>
