@@ -4,6 +4,107 @@ import { getUserSession } from '@/lib/session';
 import { getCurrentWeek, getWeekGames } from '@/lib/espn-api';
 
 /**
+ * Calculate season highlights (Most Improved, Perfect Weeks, etc.)
+ */
+function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: Map<any, any>, isPickCorrect: Function) {
+  // Calculate weekly performance for each user
+  const userWeeklyPerformance = new Map();
+  
+  users.forEach(user => {
+    const userPicks = allPicks.filter(p => p.userId === user.id);
+    const weekMap = new Map<number, { correct: number; total: number }>();
+    
+    userPicks.forEach(pick => {
+      if (!weekMap.has(pick.week)) {
+        weekMap.set(pick.week, { correct: 0, total: 0 });
+      }
+    });
+    
+    userPicks.forEach(pick => {
+      const games = gamesByWeek.get(pick.week);
+      if (!games) return;
+      
+      const result = isPickCorrect(pick, games);
+      const weekData = weekMap.get(pick.week)!;
+      
+      if (result === true) {
+        weekData.correct++;
+        weekData.total++;
+      } else if (result === false) {
+        weekData.total++;
+      }
+    });
+    
+    userWeeklyPerformance.set(user.id, {
+      user,
+      weeks: Array.from(weekMap.entries())
+        .map(([week, data]) => ({ week, ...data }))
+        .sort((a, b) => a.week - b.week),
+    });
+  });
+
+  // Find Most Improved (best improvement from one week to next)
+  let mostImproved = null;
+  let biggestImprovement = 0;
+
+  userWeeklyPerformance.forEach((data) => {
+    const weeks = data.weeks;
+    for (let i = 1; i < weeks.length; i++) {
+      const prevWeek = weeks[i - 1];
+      const currWeek = weeks[i];
+      
+      if (prevWeek.total > 0 && currWeek.total > 0) {
+        const prevRate = prevWeek.correct / prevWeek.total;
+        const currRate = currWeek.correct / currWeek.total;
+        const improvement = currRate - prevRate;
+        
+        if (improvement > biggestImprovement) {
+          biggestImprovement = improvement;
+          mostImproved = {
+            userId: data.user.id,
+            username: data.user.username,
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
+            avatarColor: data.user.avatarColor,
+            fromWeek: prevWeek.week,
+            toWeek: currWeek.week,
+            improvement: Math.round(improvement * 100),
+            fromCorrect: prevWeek.correct,
+            fromTotal: prevWeek.total,
+            toCorrect: currWeek.correct,
+            toTotal: currWeek.total,
+          };
+        }
+      }
+    }
+  });
+
+  // Find Perfect Weeks (all picks correct)
+  const perfectWeeks: any[] = [];
+  
+  userWeeklyPerformance.forEach((data) => {
+    data.weeks.forEach((week: any) => {
+      if (week.total > 0 && week.correct === week.total) {
+        perfectWeeks.push({
+          userId: data.user.id,
+          username: data.user.username,
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          avatarColor: data.user.avatarColor,
+          week: week.week,
+          correct: week.correct,
+        });
+      }
+    });
+  });
+
+  return {
+    mostImproved,
+    perfectWeeks,
+  };
+}
+
+/**
  * GET - Get season statistics for all users
  */
 export async function GET() {
@@ -174,9 +275,13 @@ export async function GET() {
       return b.winRate - a.winRate;
     });
 
+    // Calculate season highlights
+    const highlights = calculateSeasonHighlights(users, allPicks, gamesByWeek, isPickCorrect);
+
     return NextResponse.json({
       season,
       stats,
+      highlights,
     });
   } catch (error) {
     console.error('Get stats error:', error);

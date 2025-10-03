@@ -81,10 +81,10 @@
 ## 🚧 In Progress / Needs Enhancement
 
 ### 📊 Season Highlights (Stats Page)
-- [ ] Most Improved Player (week-over-week)
-- [ ] Biggest Upset Pick (tracking improbable wins)
-- [ ] Perfect Weeks (all picks correct)
-- [ ] Current streak tracking
+- [x] **Most Improved Player** - Calculates biggest improvement from week to week
+- [x] **Perfect Weeks** - Shows users who got all picks correct in a week
+- [ ] Biggest Upset Pick (would need Vegas odds - future enhancement)
+- [ ] Current streak tracking (future enhancement)
 
 ### 🎯 Monday Tiebreaker Logic
 - [ ] Validate unique guesses (no duplicates)

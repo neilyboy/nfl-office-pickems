@@ -49,6 +49,7 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<UserStats[]>([]);
   const [season, setSeason] = useState(0);
+  const [highlights, setHighlights] = useState<any>(null);
 
   useEffect(() => {
     fetchStats();
@@ -65,6 +66,7 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
 
       setStats(data.stats || []);
       setSeason(data.season);
+      setHighlights(data.highlights || null);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -272,32 +274,68 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
               </Card>
             )}
 
-            {/* Fun Facts */}
+            {/* Season Highlights */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Season Highlights 🎉</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Most Improved */}
                 <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-green-500" />
-                    <span className="font-semibold">Most Improved</span>
+                    <div>
+                      <p className="font-semibold">Most Improved</p>
+                      {highlights?.mostImproved && (
+                        <p className="text-xs text-muted-foreground">
+                          {highlights.mostImproved.firstName} {highlights.mostImproved.lastName}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <Badge variant="secondary">Coming Soon</Badge>
+                  {highlights?.mostImproved ? (
+                    <div className="text-right">
+                      <Badge variant="default" className="bg-green-500">
+                        +{highlights.mostImproved.improvement}%
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Week {highlights.mostImproved.fromWeek} → {highlights.mostImproved.toWeek}
+                      </p>
+                    </div>
+                  ) : (
+                    <Badge variant="secondary">No data yet</Badge>
+                  )}
                 </div>
-                <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <TrendingDown className="w-5 h-5 text-red-500" />
-                    <span className="font-semibold">Biggest Upset Pick</span>
-                  </div>
-                  <Badge variant="secondary">Coming Soon</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
-                  <div className="flex items-center gap-2">
+
+                {/* Perfect Weeks */}
+                <div className="p-3 bg-secondary/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-5 h-5 text-blue-500" />
                     <span className="font-semibold">Perfect Weeks</span>
                   </div>
-                  <Badge variant="secondary">Coming Soon</Badge>
+                  {highlights?.perfectWeeks && highlights.perfectWeeks.length > 0 ? (
+                    <div className="space-y-2 mt-2">
+                      {highlights.perfectWeeks.map((pw: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6" style={{ backgroundColor: pw.avatarColor }}>
+                              <AvatarFallback style={{ backgroundColor: pw.avatarColor, color: 'white', fontSize: '10px' }}>
+                                {getInitials(pw.firstName, pw.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{pw.firstName} {pw.lastName}</span>
+                          </div>
+                          <Badge variant="outline">
+                            Week {pw.week} - {pw.correct}/{pw.correct}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      No perfect weeks yet
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
