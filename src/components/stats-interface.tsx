@@ -18,6 +18,7 @@ import {
   Award
 } from 'lucide-react';
 import { UserAvatar } from '@/components/user-avatar';
+import { PerformanceCharts } from '@/components/performance-charts';
 
 interface StatsInterfaceProps {
   user: {
@@ -644,6 +645,17 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
               </Card>
             </div>
           </>
+        )}
+
+        {/* Performance Charts Section */}
+        {analytics.length > 0 && (
+          <div className="mt-8">
+            <PerformanceCharts
+              userAnalytics={analytics.find(a => a.userId === user.userId)}
+              allAnalytics={analytics}
+              userName={user.firstName}
+            />
+          </div>
         )}
       </main>
     </div>
