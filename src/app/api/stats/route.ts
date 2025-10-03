@@ -12,11 +12,11 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
   
   users.forEach(user => {
     const userPicks = allPicks.filter(p => p.userId === user.id);
-    const weekMap = new Map<number, { correct: number; total: number }>();
+    const weekMap = new Map<number, { correct: number; total: number; completed: boolean }>();
     
     userPicks.forEach(pick => {
       if (!weekMap.has(pick.week)) {
-        weekMap.set(pick.week, { correct: 0, total: 0 });
+        weekMap.set(pick.week, { correct: 0, total: 0, completed: false });
       }
     });
     
@@ -24,8 +24,12 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
       const games = gamesByWeek.get(pick.week);
       if (!games) return;
       
-      const result = isPickCorrect(pick, games);
+      // Check if all games in this week are completed
+      const allGamesCompleted = games.every((g: any) => g.status.type.state === 'post');
       const weekData = weekMap.get(pick.week)!;
+      weekData.completed = allGamesCompleted;
+      
+      const result = isPickCorrect(pick, games);
       
       if (result === true) {
         weekData.correct++;
@@ -79,12 +83,13 @@ function calculateSeasonHighlights(users: any[], allPicks: any[], gamesByWeek: M
     }
   });
 
-  // Find Perfect Weeks (all picks correct)
+  // Find Perfect Weeks (all picks correct) - only completed weeks
   const perfectWeeks: any[] = [];
   
   userWeeklyPerformance.forEach((data) => {
     data.weeks.forEach((week: any) => {
-      if (week.total > 0 && week.correct === week.total) {
+      // Only count perfect weeks that are fully completed
+      if (week.total > 0 && week.correct === week.total && week.completed) {
         perfectWeeks.push({
           userId: data.user.id,
           username: data.user.username,
