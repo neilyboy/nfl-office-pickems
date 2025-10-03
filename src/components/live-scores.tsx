@@ -16,6 +16,12 @@ import {
   Activity,
   Trophy
 } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { formatTime, getDayOfWeek } from '@/lib/utils';
 import { UserAvatar } from '@/components/user-avatar';
 import { ESPNGame } from '@/lib/espn-api';
@@ -31,11 +37,25 @@ interface LiveScoresProps {
   };
 }
 
+interface Picker {
+  userId: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarColor: string;
+  avatarType?: string;
+  avatarValue?: string | null;
+}
+
 interface GameWithPicks extends ESPNGame {
   userPick?: string;
   totalPicks?: {
     homeCount: number;
     awayCount: number;
+  };
+  pickers?: {
+    home: Picker[];
+    away: Picker[];
   };
 }
 
@@ -51,6 +71,62 @@ interface UserStanding {
   incorrect: number;
   remaining: number;
   mondayGuess: number | null;
+}
+
+// Component to display pickers for a team
+function PickerAvatars({ pickers, currentUserId }: { pickers: Picker[], currentUserId: number }) {
+  if (!pickers || pickers.length === 0) {
+    return <p className="text-xs text-muted-foreground">No picks yet</p>;
+  }
+
+  const maxVisible = 5;
+  const visiblePickers = pickers.slice(0, maxVisible);
+  const remainingCount = pickers.length - maxVisible;
+
+  return (
+    <TooltipProvider>
+      <div className="flex items-center gap-1 flex-wrap">
+        {visiblePickers.map((picker) => (
+          <Tooltip key={picker.userId}>
+            <TooltipTrigger asChild>
+              <div className={`${picker.userId === currentUserId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-full' : ''}`}>
+                <UserAvatar
+                  firstName={picker.firstName}
+                  lastName={picker.lastName}
+                  avatarType={picker.avatarType}
+                  avatarValue={picker.avatarValue}
+                  avatarColor={picker.avatarColor}
+                  size="sm"
+                  className="cursor-pointer"
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-semibold">{picker.firstName} {picker.lastName}</p>
+              <p className="text-xs text-muted-foreground">@{picker.username}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+        {remainingCount > 0 && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold cursor-pointer">
+                +{remainingCount}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-semibold">+{remainingCount} more</p>
+              {pickers.slice(maxVisible).map((picker) => (
+                <p key={picker.userId} className="text-xs">
+                  {picker.firstName} {picker.lastName}
+                </p>
+              ))}
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </TooltipProvider>
+  );
 }
 
 export function LiveScores({ user }: LiveScoresProps) {
@@ -313,10 +389,10 @@ export function LiveScores({ user }: LiveScoresProps) {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-semibold">{awayTeam.team.displayName}</p>
-                                  {game.totalPicks && (
-                                    <p className="text-xs text-muted-foreground">
-                                      {game.totalPicks.awayCount} pick{game.totalPicks.awayCount !== 1 ? 's' : ''}
-                                    </p>
+                                  {game.pickers && (
+                                    <div className="mt-1">
+                                      <PickerAvatars pickers={game.pickers.away} currentUserId={user.userId} />
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -339,10 +415,10 @@ export function LiveScores({ user }: LiveScoresProps) {
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-semibold">{homeTeam.team.displayName}</p>
-                                  {game.totalPicks && (
-                                    <p className="text-xs text-muted-foreground">
-                                      {game.totalPicks.homeCount} pick{game.totalPicks.homeCount !== 1 ? 's' : ''}
-                                    </p>
+                                  {game.pickers && (
+                                    <div className="mt-1">
+                                      <PickerAvatars pickers={game.pickers.home} currentUserId={user.userId} />
+                                    </div>
                                   )}
                                 </div>
                               </div>

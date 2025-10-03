@@ -48,12 +48,41 @@ export async function GET() {
       const homeTeam = game.competitions[0].competitors.find(c => c.homeAway === 'home');
       const awayTeam = game.competitions[0].competitors.find(c => c.homeAway === 'away');
 
+      // Get users who picked each team
+      const homePickers = gamePicks
+        .filter(p => p.pickedTeamId === homeTeam?.team.id)
+        .map(p => ({
+          userId: p.user.id,
+          username: p.user.username,
+          firstName: p.user.firstName,
+          lastName: p.user.lastName,
+          avatarColor: p.user.avatarColor,
+          avatarType: p.user.avatarType,
+          avatarValue: p.user.avatarValue,
+        }));
+
+      const awayPickers = gamePicks
+        .filter(p => p.pickedTeamId === awayTeam?.team.id)
+        .map(p => ({
+          userId: p.user.id,
+          username: p.user.username,
+          firstName: p.user.firstName,
+          lastName: p.user.lastName,
+          avatarColor: p.user.avatarColor,
+          avatarType: p.user.avatarType,
+          avatarValue: p.user.avatarValue,
+        }));
+
       return {
         ...game,
         userPick: userPick?.pickedTeamId,
         totalPicks: {
-          homeCount: gamePicks.filter(p => p.pickedTeamId === homeTeam?.team.id).length,
-          awayCount: gamePicks.filter(p => p.pickedTeamId === awayTeam?.team.id).length,
+          homeCount: homePickers.length,
+          awayCount: awayPickers.length,
+        },
+        pickers: {
+          home: homePickers,
+          away: awayPickers,
         },
       };
     });
