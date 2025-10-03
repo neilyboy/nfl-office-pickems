@@ -20,6 +20,8 @@ export async function GET() {
         firstName: true,
         lastName: true,
         avatarColor: true,
+        avatarType: true,
+        avatarValue: true,
         createdAt: true,
       },
     });
@@ -64,6 +66,8 @@ export async function PATCH(request: Request) {
         firstName: true,
         lastName: true,
         avatarColor: true,
+        avatarType: true,
+        avatarValue: true,
       },
     });
 

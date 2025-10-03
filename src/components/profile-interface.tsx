@@ -45,16 +45,30 @@ const AVATAR_COLORS = [
 ];
 
 const AVATAR_EMOJIS = [
-  // Sports & Activities
+  // Sports & Activities (25)
   '🏈', '⚽', '🏀', '⚾', '🎾', '🏐', '🏉', '🥎', '🏏', '🏒',
-  // Animals
+  '🥊', '🥋', '🎱', '🏓', '🏸', '🏹', '🎿', '⛷️', '🏂', '🤼',
+  '🤺', '🤸', '⛳', '🎯', '🎣',
+  // Animals (40)
   '🦅', '🐻', '🐯', '🦁', '🐺', '🦊', '🐴', '🦌', '🐆', '🐊',
-  // Faces & Expressions  
+  '🦈', '🐉', '🐲', '🦖', '🦕', '🐘', '🦏', '🦛', '🐢', '🐍',
+  '🦎', '🐙', '🦑', '🦞', '🦀', '🦐', '🐝', '🐛', '🦋', '🐌',
+  '🐞', '🐜', '🦗', '🕷️', '🦂', '🐇', '🐿️', '🦔', '🦇', '🦉',
+  // Faces & Expressions (40)
   '😎', '🤠', '🥳', '🤩', '😤', '🤯', '😈', '👽', '🤖', '👻',
-  // Symbols & Objects
+  '💀', '☠️', '👹', '👺', '🤡', '💩', '👾', '🎃', '😺', '😸',
+  '😻', '😼', '😽', '🙀', '😿', '😹', '🦸', '🦹', '🧙', '🧚',
+  '🧛', '🧜', '🧝', '🧞', '🧟', '🦾', '🦿', '🧠', '🦷', '👀',
+  // Symbols & Objects (50)
   '🔥', '⚡', '💪', '👑', '🎯', '🎪', '🎲', '🎰', '🏆', '🥇',
-  // Nature & Weather
-  '⭐', '💫', '🌟', '✨', '☀️', '🌙', '⚡', '🌈', '🔱', '💎',
+  '🥈', '🥉', '🏅', '⭐', '🌟', '💫', '✨', '🎭', '🎨', '🎬',
+  '🎤', '🎧', '🎼', '🎹', '🥁', '🎺', '🎸', '🎻', '🎮', '🕹️',
+  '🎲', '♠️', '♥️', '♦️', '♣️', '🃏', '🀄', '🎴', '🔮', '🎁',
+  '🎈', '🎉', '🎊', '🎀', '💎', '💍', '👑', '🔱', '⚔️', '🛡️',
+  // Nature & Weather (30)
+  '☀️', '🌙', '⭐', '🌟', '💫', '✨', '🌈', '☄️', '🌠', '🌌',
+  '🪐', '⚡', '🔥', '💧', '🌊', '🌪️', '🌀', '🌋', '🏔️', '⛰️',
+  '🗻', '🏕️', '🏖️', '🏝️', '🏜️', '🌲', '🌳', '🌴', '🌵', '🍀',
 ];
 
 const AVATAR_TYPE_LABELS = {
@@ -286,9 +300,9 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-6">
-                <Avatar className="w-24 h-24" style={{ backgroundColor: selectedColor }}>
-                  <AvatarFallback style={{ backgroundColor: selectedColor, color: 'white', fontSize: '32px' }}>
-                    {getInitials(user.firstName, user.lastName)}
+                <Avatar className="w-24 h-24" style={{ backgroundColor: avatarType === 'initials' ? selectedColor : '#1e293b' }}>
+                  <AvatarFallback style={{ backgroundColor: avatarType === 'initials' ? selectedColor : '#1e293b', color: 'white', fontSize: avatarType === 'emoji' ? '48px' : '32px' }}>
+                    {avatarType === 'emoji' ? selectedEmoji : getInitials(user.firstName, user.lastName)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
