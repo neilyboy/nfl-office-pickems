@@ -10,13 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   ArrowLeft, 
-  Send,
   LogOut,
   MessageSquare,
   Smile,
-  Activity
+  Activity,
+  Send
 } from 'lucide-react';
-import { formatTime, getInitials } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
+import { UserAvatar } from '@/components/user-avatar';
 
 interface ChatInterfaceProps {
   user: {
@@ -34,6 +35,8 @@ interface ChatMessage {
     firstName: string;
     lastName: string;
     avatarColor: string;
+    avatarType?: string;
+    avatarValue?: string | null;
   };
   message: string;
   createdAt: string;
@@ -258,14 +261,15 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
                       className={`flex gap-3 ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}
                     >
                       {showAvatar ? (
-                        <Avatar 
-                          className="w-10 h-10 flex-shrink-0" 
-                          style={{ backgroundColor: msg.user.avatarColor }}
-                        >
-                          <AvatarFallback style={{ backgroundColor: msg.user.avatarColor, color: 'white' }}>
-                            {getInitials(msg.user.firstName, msg.user.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          firstName={msg.user.firstName}
+                          lastName={msg.user.lastName}
+                          avatarType={msg.user.avatarType}
+                          avatarValue={msg.user.avatarValue}
+                          avatarColor={msg.user.avatarColor}
+                          size="md"
+                          className="flex-shrink-0"
+                        />
                       ) : (
                         <div className="w-10 flex-shrink-0" />
                       )}
