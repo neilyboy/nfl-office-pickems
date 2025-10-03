@@ -4,7 +4,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { prisma } from '@/lib/db';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+const DATA_DIR = path.join(process.cwd(), 'prisma', 'data');
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 
 /**
