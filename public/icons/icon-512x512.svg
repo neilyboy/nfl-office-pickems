@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#3b82f6" rx="76.8"/>
+  
+  <!-- Football -->
+  <ellipse cx="256" cy="256" rx="179.2" ry="128" fill="#8b4513" stroke="#654321" stroke-width="10.24"/>
+  
+  <!-- Laces -->
+  <line x1="256" y1="179.2" x2="256" y2="332.8" stroke="white" stroke-width="12.8" stroke-linecap="round"/>
+  <line x1="204.8" y1="215.04" x2="307.2" y2="215.04" stroke="white" stroke-width="7.68" stroke-linecap="round"/>
+  <line x1="204.8" y1="256" x2="307.2" y2="256" stroke="white" stroke-width="7.68" stroke-linecap="round"/>
+  <line x1="204.8" y1="296.96" x2="307.2" y2="296.96" stroke="white" stroke-width="7.68" stroke-linecap="round"/>
+  
+  <!-- Text -->
+  <text x="256" y="450.56" font-family="Arial, sans-serif" font-size="61.44" font-weight="bold" fill="white" text-anchor="middle">PICKEMS</text>
+</svg>
