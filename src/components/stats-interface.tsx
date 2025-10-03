@@ -17,7 +17,7 @@ import {
   Target,
   Award
 } from 'lucide-react';
-import { getInitials } from '@/lib/utils';
+import { UserAvatar } from '@/components/user-avatar';
 
 interface StatsInterfaceProps {
   user: {
@@ -34,6 +34,8 @@ interface UserStats {
   firstName: string;
   lastName: string;
   avatarColor: string;
+  avatarType?: string;
+  avatarValue?: string | null;
   totalWeeks: number;
   totalCorrect: number;
   totalIncorrect: number;
@@ -220,11 +222,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                       key={progress.userId}
                       className="flex items-center gap-3 p-3 rounded-lg bg-orange-500/10 border-2 border-orange-500/30"
                     >
-                      <Avatar className="w-10 h-10" style={{ backgroundColor: progress.avatarColor }}>
-                        <AvatarFallback style={{ backgroundColor: progress.avatarColor, color: 'white' }}>
-                          {getInitials(progress.firstName, progress.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        firstName={progress.firstName}
+                        lastName={progress.lastName}
+                        avatarType={progress.avatarType}
+                        avatarValue={progress.avatarValue}
+                        avatarColor={progress.avatarColor}
+                        size="md"
+                      />
                       <div className="flex-1">
                         <p className="font-semibold">{progress.firstName} {progress.lastName}</p>
                         <p className="text-sm text-orange-500 font-bold">
@@ -275,11 +280,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                         {index === 2 && '🥉'}
                         {index > 2 && <span className="text-muted-foreground">{index + 1}</span>}
                       </div>
-                      <Avatar className="w-10 h-10" style={{ backgroundColor: stat.avatarColor }}>
-                        <AvatarFallback style={{ backgroundColor: stat.avatarColor, color: 'white' }}>
-                          {getInitials(stat.firstName, stat.lastName)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        firstName={stat.firstName}
+                        lastName={stat.lastName}
+                        avatarType={stat.avatarType}
+                        avatarValue={stat.avatarValue}
+                        avatarColor={stat.avatarColor}
+                        size="md"
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold truncate">
                           {stat.firstName} {stat.lastName}
@@ -316,11 +324,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
-                    <Avatar className="w-16 h-16" style={{ backgroundColor: topPerformer.avatarColor }}>
-                      <AvatarFallback style={{ backgroundColor: topPerformer.avatarColor, color: 'white' }}>
-                        {getInitials(topPerformer.firstName, topPerformer.lastName)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar
+                      firstName={topPerformer.firstName}
+                      lastName={topPerformer.lastName}
+                      avatarType={topPerformer.avatarType}
+                      avatarValue={topPerformer.avatarValue}
+                      avatarColor={topPerformer.avatarColor}
+                      size="xl"
+                    />
                     <div className="flex-1">
                       <p className="text-xl font-bold">
                         {topPerformer.firstName} {topPerformer.lastName}
@@ -379,11 +390,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                       {highlights.perfectWeeks.map((pw: any, idx: number) => (
                         <div key={idx} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6" style={{ backgroundColor: pw.avatarColor }}>
-                              <AvatarFallback style={{ backgroundColor: pw.avatarColor, color: 'white', fontSize: '10px' }}>
-                                {getInitials(pw.firstName, pw.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              firstName={pw.firstName}
+                              lastName={pw.lastName}
+                              avatarType={pw.avatarType}
+                              avatarValue={pw.avatarValue}
+                              avatarColor={pw.avatarColor}
+                              size="sm"
+                            />
                             <span>{pw.firstName} {pw.lastName}</span>
                           </div>
                           <Badge variant="outline">
@@ -417,11 +431,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                     {lunchTracker.map((tracker) => (
                       <div key={tracker.userId} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <Avatar className="w-10 h-10" style={{ backgroundColor: tracker.avatarColor }}>
-                            <AvatarFallback style={{ backgroundColor: tracker.avatarColor, color: 'white' }}>
-                              {getInitials(tracker.firstName, tracker.lastName)}
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            firstName={tracker.firstName}
+                            lastName={tracker.lastName}
+                            avatarType={tracker.avatarType}
+                            avatarValue={tracker.avatarValue}
+                            avatarColor={tracker.avatarColor}
+                            size="md"
+                          />
                           <div>
                             <p className="font-semibold">{tracker.firstName} {tracker.lastName}</p>
                             <p className="text-xs text-muted-foreground">
@@ -484,11 +501,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                             <span className="text-2xl font-bold w-8">
                               {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`}
                             </span>
-                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
-                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
-                                {getInitials(a.firstName, a.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              firstName={a.firstName}
+                              lastName={a.lastName}
+                              avatarType={a.avatarType}
+                              avatarValue={a.avatarValue}
+                              avatarColor={a.avatarColor}
+                              size="md"
+                            />
                             <span className="font-semibold">{a.firstName} {a.lastName}</span>
                           </div>
                           <Badge className="bg-green-500">
@@ -519,11 +539,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                             <span className="text-2xl font-bold w-8">
                               {idx === 0 ? '😬' : idx === 1 ? '😅' : idx === 2 ? '😓' : `${idx + 1}.`}
                             </span>
-                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
-                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
-                                {getInitials(a.firstName, a.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              firstName={a.firstName}
+                              lastName={a.lastName}
+                              avatarType={a.avatarType}
+                              avatarValue={a.avatarValue}
+                              avatarColor={a.avatarColor}
+                              size="md"
+                            />
                             <span className="font-semibold">{a.firstName} {a.lastName}</span>
                           </div>
                           <Badge className="bg-red-500">
@@ -555,11 +578,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                             <span className="text-2xl font-bold w-8">
                               {idx === 0 ? '🔥' : idx === 1 ? '🌟' : idx === 2 ? '⚡' : `${idx + 1}.`}
                             </span>
-                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
-                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
-                                {getInitials(a.firstName, a.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              firstName={a.firstName}
+                              lastName={a.lastName}
+                              avatarType={a.avatarType}
+                              avatarValue={a.avatarValue}
+                              avatarColor={a.avatarColor}
+                              size="md"
+                            />
                             <div>
                               <p className="font-semibold">{a.firstName} {a.lastName}</p>
                               {a.hotHandWeeks.length > 0 && (
@@ -598,11 +624,14 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                             <span className="text-2xl font-bold w-8">
                               {idx === 0 ? '🎯' : idx === 1 ? '📊' : idx === 2 ? '⚖️' : `${idx + 1}.`}
                             </span>
-                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
-                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
-                                {getInitials(a.firstName, a.lastName)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar
+                              firstName={a.firstName}
+                              lastName={a.lastName}
+                              avatarType={a.avatarType}
+                              avatarValue={a.avatarValue}
+                              avatarColor={a.avatarColor}
+                              size="md"
+                            />
                             <span className="font-semibold">{a.firstName} {a.lastName}</span>
                           </div>
                           <Badge className="bg-blue-500">
