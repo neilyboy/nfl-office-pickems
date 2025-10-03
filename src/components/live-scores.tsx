@@ -45,6 +45,8 @@ interface UserStanding {
   firstName: string;
   lastName: string;
   avatarColor: string;
+  avatarType?: string;
+  avatarValue?: string | null;
   correct: number;
   incorrect: number;
   remaining: number;

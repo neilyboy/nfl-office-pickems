@@ -34,6 +34,8 @@ interface WeeklyResult {
     firstName: string;
     lastName: string;
     avatarColor: string;
+    avatarType?: string;
+    avatarValue?: string | null;
     correct: number;
     total: number;
   } | null;
@@ -43,6 +45,8 @@ interface WeeklyResult {
     firstName: string;
     lastName: string;
     avatarColor: string;
+    avatarType?: string;
+    avatarValue?: string | null;
     correct: number;
     total: number;
   } | null;
