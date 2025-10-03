@@ -29,19 +29,22 @@ export function AdminDashboard() {
 
   const fetchAdminStats = async () => {
     try {
-      const [statsResponse, standingsResponse] = await Promise.all([
+      const [statsResponse, standingsResponse, usersResponse] = await Promise.all([
         fetch('/api/stats'),
         fetch('/api/standings'),
+        fetch('/api/admin/users'),
       ]);
 
       const statsData = await statsResponse.json();
       const standingsData = await standingsResponse.json();
+      const usersData = await usersResponse.json();
 
       console.log('Admin Stats Data:', statsData);
       console.log('Admin Standings Data:', standingsData);
+      console.log('Admin Users Data:', usersData);
 
-      // Count total users
-      const totalUsers = statsData.stats?.length || 0;
+      // Count total users from the users API (more accurate)
+      const totalUsers = usersData.users?.length || 0;
 
       // Calculate total lunches owed
       let lunchesOwed = 0;
@@ -216,7 +219,7 @@ export function AdminDashboard() {
               <CardContent>
                 <div className="text-3xl font-bold">{stats.lunchesOwed}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {stats.lunchesOwed === 0 ? 'All paid up! 🍔' : 'Total debts'}
+                  {stats.lunchesOwed === 0 ? 'No completed weeks yet 🍔' : 'Total owed'}
                 </p>
               </CardContent>
             </Card>
