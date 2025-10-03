@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { UserAvatar } from '@/components/user-avatar';
 import { PerformanceCharts } from '@/components/performance-charts';
+import { BadgeDisplay } from '@/components/badge-display';
+import { calculateUserBadges } from '@/lib/badges';
 
 interface StatsInterfaceProps {
   user: {
@@ -654,6 +656,19 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
               userAnalytics={analytics.find(a => a.userId === user.userId)}
               allAnalytics={analytics}
               userName={user.firstName}
+            />
+          </div>
+        )}
+
+        {/* Trophy Case Section */}
+        {analytics.length > 0 && (
+          <div className="mt-12">
+            <BadgeDisplay
+              earnedBadges={calculateUserBadges(
+                analytics.find(a => a.userId === user.userId),
+                analytics
+              )}
+              compact={false}
             />
           </div>
         )}

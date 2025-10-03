@@ -19,6 +19,8 @@ import {
   Save
 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
+import { BadgeDisplay } from '@/components/badge-display';
+import { calculateUserBadges } from '@/lib/badges';
 
 interface ProfileInterfaceProps {
   user: {
@@ -83,6 +85,7 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
   const [saving, setSaving] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<any[]>([]);
   const [selectedColor, setSelectedColor] = useState('');
   const [avatarType, setAvatarType] = useState<'initials' | 'emoji'>('initials');
   const [selectedEmoji, setSelectedEmoji] = useState('');
@@ -116,6 +119,7 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
       // Find current user's stats
       const userStats = statsData.stats?.find((s: any) => s.userId === user.userId);
       setStats(userStats || null);
+      setAnalytics(statsData.analytics || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -360,6 +364,30 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
                   <span className="text-muted-foreground">Worst Week</span>
                   <Badge className="bg-orange-500">{stats.worstWeek} correct</Badge>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Badges Section */}
+          {analytics.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-500" />
+                  Achievements
+                </CardTitle>
+                <CardDescription>
+                  Badges you've earned this season
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BadgeDisplay
+                  earnedBadges={calculateUserBadges(
+                    analytics.find(a => a.userId === user.userId),
+                    analytics
+                  )}
+                  compact={true}
+                />
               </CardContent>
             </Card>
           )}
