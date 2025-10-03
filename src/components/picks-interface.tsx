@@ -355,6 +355,9 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
               <Button variant="outline" size="sm" onClick={() => router.push('/scores')}>
                 📊 Scores
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/standings')}>
+                🏆 Standings
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/chat')}>
                 💬 Chat
               </Button>

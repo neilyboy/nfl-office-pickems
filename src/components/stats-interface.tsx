@@ -128,6 +128,9 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
               <Button variant="outline" size="sm" onClick={() => router.push('/scores')}>
                 📊 Scores
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/standings')}>
+                🏆 Standings
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/chat')}>
                 💬 Chat
               </Button>

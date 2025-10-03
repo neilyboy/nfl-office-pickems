@@ -205,6 +205,9 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
               <Button variant="outline" size="sm" onClick={() => router.push('/scores')}>
                 📊 Scores
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/standings')}>
+                🏆 Standings
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/stats')}>
                 📈 Stats
               </Button>

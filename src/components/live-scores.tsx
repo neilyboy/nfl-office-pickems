@@ -187,25 +187,16 @@ export function LiveScores({ user }: LiveScoresProps) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/picks')}
-              >
+              <Button variant="outline" size="sm" onClick={() => router.push('/picks')}>
                 🏈 Picks
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/chat')}
-              >
+              <Button variant="outline" size="sm" onClick={() => router.push('/standings')}>
+                🏆 Standings
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/chat')}>
                 💬 Chat
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/stats')}
-              >
+              <Button variant="outline" size="sm" onClick={() => router.push('/stats')}>
                 📈 Stats
               </Button>
               <Button
