@@ -458,6 +458,164 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
             </Card>
           </div>
         </div>
+
+        {/* Advanced Analytics Section */}
+        {analytics.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mt-12 mb-6">📊 Advanced Analytics</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Longest Win Streak */}
+              <Card className="border-green-500/50 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    📈 Longest Win Streaks
+                  </CardTitle>
+                  <CardDescription>Most correct picks in a row</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analytics
+                      .sort((a, b) => b.bestStreak - a.bestStreak)
+                      .slice(0, 5)
+                      .map((a, idx) => (
+                        <div key={a.userId} className="flex items-center justify-between p-3 rounded-lg bg-green-500/10">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-bold w-8">
+                              {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`}
+                            </span>
+                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
+                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
+                                {getInitials(a.firstName, a.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold">{a.firstName} {a.lastName}</span>
+                          </div>
+                          <Badge className="bg-green-500">
+                            {a.bestStreak} in a row
+                          </Badge>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Longest Loss Streak */}
+              <Card className="border-red-500/50 bg-gradient-to-br from-red-500/5 to-orange-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    📉 Longest Loss Streaks
+                  </CardTitle>
+                  <CardDescription>Most wrong picks in a row (ouch!)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analytics
+                      .sort((a, b) => b.worstStreak - a.worstStreak)
+                      .slice(0, 5)
+                      .map((a, idx) => (
+                        <div key={a.userId} className="flex items-center justify-between p-3 rounded-lg bg-red-500/10">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-bold w-8">
+                              {idx === 0 ? '😬' : idx === 1 ? '😅' : idx === 2 ? '😓' : `${idx + 1}.`}
+                            </span>
+                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
+                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
+                                {getInitials(a.firstName, a.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold">{a.firstName} {a.lastName}</span>
+                          </div>
+                          <Badge className="bg-red-500">
+                            {a.worstStreak} wrong
+                          </Badge>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Hot Hand (3-week best) */}
+              <Card className="border-orange-500/50 bg-gradient-to-br from-orange-500/5 to-yellow-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    🔥 Hot Hand Award
+                  </CardTitle>
+                  <CardDescription>Best 3-week stretch this season</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analytics
+                      .filter(a => a.hotHand > 0)
+                      .sort((a, b) => b.hotHand - a.hotHand)
+                      .slice(0, 5)
+                      .map((a, idx) => (
+                        <div key={a.userId} className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-bold w-8">
+                              {idx === 0 ? '🔥' : idx === 1 ? '🌟' : idx === 2 ? '⚡' : `${idx + 1}.`}
+                            </span>
+                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
+                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
+                                {getInitials(a.firstName, a.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold">{a.firstName} {a.lastName}</p>
+                              {a.hotHandWeeks.length > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                  Weeks {a.hotHandWeeks.join(', ')}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <Badge className="bg-orange-500">
+                            {a.hotHand} correct
+                          </Badge>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Mr. Consistent */}
+              <Card className="border-blue-500/50 bg-gradient-to-br from-blue-500/5 to-cyan-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    🎪 Mr. Consistent
+                  </CardTitle>
+                  <CardDescription>Smallest variance between best/worst weeks</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {analytics
+                      .filter(a => a.consistency >= 0)
+                      .sort((a, b) => a.consistency - b.consistency)
+                      .slice(0, 5)
+                      .map((a, idx) => (
+                        <div key={a.userId} className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-bold w-8">
+                              {idx === 0 ? '🎯' : idx === 1 ? '📊' : idx === 2 ? '⚖️' : `${idx + 1}.`}
+                            </span>
+                            <Avatar className="w-10 h-10" style={{ backgroundColor: a.avatarColor }}>
+                              <AvatarFallback style={{ backgroundColor: a.avatarColor, color: 'white' }}>
+                                {getInitials(a.firstName, a.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold">{a.firstName} {a.lastName}</span>
+                          </div>
+                          <Badge className="bg-blue-500">
+                            ±{a.consistency} variance
+                          </Badge>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

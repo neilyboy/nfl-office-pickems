@@ -253,6 +253,53 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
       worstStreak = tempStreak;
     }
     
+    // Calculate Hot Hand (best recent 3-week stretch)
+    let hotHand = 0;
+    let hotHandWeeks: number[] = [];
+    const completedWeeks = weeklyPerformance.filter(w => w.total > 0);
+    if (completedWeeks.length >= 3) {
+      for (let i = 0; i <= completedWeeks.length - 3; i++) {
+        const threeWeekCorrect = completedWeeks[i].correct + completedWeeks[i + 1].correct + completedWeeks[i + 2].correct;
+        if (threeWeekCorrect > hotHand) {
+          hotHand = threeWeekCorrect;
+          hotHandWeeks = [completedWeeks[i].week, completedWeeks[i + 1].week, completedWeeks[i + 2].week];
+        }
+      }
+    }
+    
+    // Calculate Cold Streak (worst recent 3-week stretch)
+    let coldStreak = 999;
+    let coldStreakWeeks: number[] = [];
+    if (completedWeeks.length >= 3) {
+      for (let i = 0; i <= completedWeeks.length - 3; i++) {
+        const threeWeekCorrect = completedWeeks[i].correct + completedWeeks[i + 1].correct + completedWeeks[i + 2].correct;
+        if (threeWeekCorrect < coldStreak) {
+          coldStreak = threeWeekCorrect;
+          coldStreakWeeks = [completedWeeks[i].week, completedWeeks[i + 1].week, completedWeeks[i + 2].week];
+        }
+      }
+    }
+    if (coldStreak === 999) coldStreak = 0;
+    
+    // Calculate Consistency (smaller = more consistent)
+    const correctCounts = completedWeeks.map(w => w.correct);
+    const consistency = correctCounts.length > 1 
+      ? Math.max(...correctCounts) - Math.min(...correctCounts)
+      : 0;
+    
+    // Calculate Clutch Factor (Monday night accuracy)
+    const mondayPicks = userPicks.filter(p => p.mondayNightGuess !== null);
+    let clutchFactorCount = 0;
+    mondayPicks.forEach(pick => {
+      const games = gamesByWeek.get(pick.week);
+      if (!games) return;
+      
+      // Check if week is complete
+      const allCompleted = games.every((g: any) => g.status.type.state === 'post');
+      if (allCompleted) clutchFactorCount++;
+    });
+    const clutchFactor = mondayPicks.length > 0 ? clutchFactorCount : 0;
+    
     return {
       userId: user.id,
       username: user.username,
@@ -263,6 +310,13 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
       streakType,
       bestStreak,
       worstStreak,
+      hotHand,
+      hotHandWeeks,
+      coldStreak,
+      coldStreakWeeks,
+      consistency,
+      clutchFactor,
+      totalMondayPicks: mondayPicks.length,
       weeklyPerformance,
     };
   });
