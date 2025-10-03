@@ -10,13 +10,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { 
   ArrowLeft, 
   RefreshCw,
-  Trophy,
   LogOut,
   TrendingUp,
   Users,
-  Activity
+  Activity,
+  Trophy
 } from 'lucide-react';
-import { formatTime, getDayOfWeek, getInitials } from '@/lib/utils';
+import { formatTime, getDayOfWeek } from '@/lib/utils';
+import { UserAvatar } from '@/components/user-avatar';
 import { ESPNGame } from '@/lib/espn-api';
 import { getTeamLogoPath } from '@/lib/team-mappings';
 import Image from 'next/image';
@@ -400,11 +401,14 @@ export function LiveScores({ user }: LiveScoresProps) {
                         <div className="text-lg font-bold w-6 text-center text-muted-foreground">
                           {index + 1}
                         </div>
-                        <Avatar className="w-8 h-8" style={{ backgroundColor: standing.avatarColor }}>
-                          <AvatarFallback style={{ backgroundColor: standing.avatarColor, color: 'white' }}>
-                            {getInitials(standing.firstName, standing.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar
+                          firstName={standing.firstName}
+                          lastName={standing.lastName}
+                          avatarType={standing.avatarType}
+                          avatarValue={standing.avatarValue}
+                          avatarColor={standing.avatarColor}
+                          size="sm"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold truncate">
                             {standing.firstName} {standing.lastName}
