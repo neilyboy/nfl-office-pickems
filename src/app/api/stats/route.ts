@@ -476,6 +476,8 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
       }
     }
     
+    console.log(`[LUNCH TRACKER] Week ${week}: Winner=${winner.user.username} (${winner.correct}/${winner.total}), Loser=${loser.user.username} (${loser.correct}/${loser.total})`);
+    
     weeklyResults.set(week, {
       winner: {
         userId: winner.user.id,
@@ -528,6 +530,8 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
       net: debt.wins - debt.losses,
     }))
     .sort((a, b) => b.net - a.net);
+  
+  console.log('[LUNCH TRACKER] Final lunch debts:', lunchArray.map(l => `${l.username}: ${l.wins}W-${l.losses}L`).join(', '));
   
   return lunchArray;
 }
