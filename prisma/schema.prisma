@@ -13,6 +13,14 @@ model AdminSettings {
   password String
 }
 
+model FeatureSettings {
+  id                      Int     @id @default(1)
+  randomPickerEnabled     Boolean @default(true)
+  upsetAlertsEnabled      Boolean @default(true)
+  powerRankingsEnabled    Boolean @default(true)
+  matchupSimulatorEnabled Boolean @default(true)
+}
+
 model User {
   id                Int      @id @default(autoincrement())
   username          String   @unique
@@ -24,6 +32,10 @@ model User {
   avatarColor       String   @default("#3b82f6") // hex color
   mustChangePassword Boolean @default(true)
   passwordResetRequested Boolean @default(false)
+  canUseRandomPicker Boolean @default(true)
+  canSeeUpsetAlerts  Boolean @default(true)
+  canSeePowerRankings Boolean @default(true)
+  canUseMatchupSim   Boolean @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

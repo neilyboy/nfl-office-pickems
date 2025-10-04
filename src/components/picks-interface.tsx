@@ -43,9 +43,14 @@ interface UserPick {
 
 export function PicksInterface({ user }: PicksInterfaceProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [permissions, setPermissions] = useState({
+    randomPicker: true,
+    upsetAlerts: true,
+    powerRankings: true,
+    matchupSimulator: true,
+  });
   const [week, setWeek] = useState(0);
   const [currentWeek, setCurrentWeek] = useState(0);
   const [season, setSeason] = useState(0);
