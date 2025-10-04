@@ -15,7 +15,8 @@ import {
   Lock,
   Palette,
   Trophy,
-  Save
+  Save,
+  LogOut
 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { BadgeDisplay } from '@/components/badge-display';
