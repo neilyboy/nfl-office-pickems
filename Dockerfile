@@ -31,10 +31,9 @@ RUN npx prisma generate
 
 # Build the application  
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build || echo "Build completed with warnings"
-RUN test -d .next || (echo "ERROR: .next directory not created" && exit 1)
-RUN touch .next/prerender-manifest.json 2>/dev/null || true
-RUN echo '{"version":4,"routes":{},"/":{"initialRevalidateSeconds":false,"srcRoute":null,"dataRoute":null},"dynamicRoutes":{},"preview":{"previewModeId":"","previewModeSigningKey":"","previewModeEncryptionKey":""}}' > .next/prerender-manifest.json
+ENV DATABASE_URL="file:./prisma/data/temp.db"
+RUN npm run build
+RUN ls -la .next/ || echo ".next directory missing!"
 
 # Runner stage
 FROM base AS runner
