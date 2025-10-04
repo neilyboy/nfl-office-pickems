@@ -14,7 +14,9 @@ import {
   TrendingUp,
   Users,
   Activity,
-  Trophy
+  Trophy,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import {
   Tooltip,
@@ -137,13 +139,14 @@ export function LiveScores({ user }: LiveScoresProps) {
   const [games, setGames] = useState<GameWithPicks[]>([]);
   const [standings, setStandings] = useState<UserStanding[]>([]);
   const [week, setWeek] = useState(0);
+  const [currentWeek, setCurrentWeek] = useState(0);
   const [season, setSeason] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
     fetchScores();
-  }, []);
+  }, [week]);
 
   useEffect(() => {
     if (!autoRefresh) return;
@@ -154,13 +157,17 @@ export function LiveScores({ user }: LiveScoresProps) {
 
     return () => clearInterval(interval);
   }, [autoRefresh]);
-
   const fetchScores = async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
 
     try {
-      const response = await fetch('/api/scores/live');
+      // If week is 0 (initial load), fetch current week. Otherwise fetch specific week
+      const url = week === 0 
+        ? '/api/scores/live' 
+        : `/api/scores/live?week=${week}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
 
       if (!response.ok) {
@@ -169,7 +176,16 @@ export function LiveScores({ user }: LiveScoresProps) {
 
       setGames(data.games || []);
       setStandings(data.standings || []);
-      setWeek(data.week);
+      
+      // On initial load, set both week and currentWeek
+      if (week === 0) {
+        setWeek(data.week);
+        setCurrentWeek(data.currentWeek);
+      } else {
+        // On subsequent fetches, only update currentWeek from response
+        setCurrentWeek(data.currentWeek);
+      }
+      
       setSeason(data.season);
       setLastUpdate(new Date());
     } catch (error: any) {
@@ -306,6 +322,37 @@ export function LiveScores({ user }: LiveScoresProps) {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Week Navigation */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Week Navigation</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWeek(w => Math.max(1, w - 1))}
+                  disabled={week <= 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Badge variant={week === currentWeek ? 'default' : 'secondary'} className="text-base px-3">
+                  Week {week}
+                  {week === currentWeek && ' (Current)'}
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWeek(w => Math.min(18, w + 1))}
+                  disabled={week >= 18}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Games */}
           <div className="lg:col-span-2 space-y-6">

@@ -5,16 +5,22 @@ import { getCurrentWeek, getWeekGames } from '@/lib/espn-api';
 
 /**
  * GET - Get live scores with user picks and standings
+ * Query params:
+ *  - week (optional): Week number to fetch. Defaults to current week.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getUserSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get current week
-    const { week, season } = await getCurrentWeek();
+    // Get week from query params or use current week
+    const { searchParams } = new URL(request.url);
+    const requestedWeek = searchParams.get('week');
+    
+    const { week: currentWeek, season } = await getCurrentWeek();
+    const week = requestedWeek ? parseInt(requestedWeek) : currentWeek;
 
     // Get games for the week
     const games = await getWeekGames(week, season);
@@ -168,6 +174,7 @@ export async function GET() {
 
     return NextResponse.json({
       week,
+      currentWeek,
       season,
       games: gamesWithPicks,
       standings,
