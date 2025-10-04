@@ -53,3 +53,58 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-primary/80;
 }
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 1cm;
+  }
+
+  /* Hide navigation and buttons when printing */
+  header,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure good contrast for printing */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Make cards printable */
+  .card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd !important;
+    margin-bottom: 1rem;
+  }
+
+  /* Ensure charts are visible */
+  canvas, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Remove shadows and effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Make links visible */
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  /* Prevent orphans and widows */
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}

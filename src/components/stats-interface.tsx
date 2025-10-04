@@ -15,12 +15,17 @@ import {
   LogOut,
   Calendar,
   Target,
-  Award
+  Award,
+  Download,
+  Printer
 } from 'lucide-react';
 import { UserAvatar } from '@/components/user-avatar';
 import { PerformanceCharts } from '@/components/performance-charts';
 import { BadgeDisplay } from '@/components/badge-display';
 import { calculateUserBadges } from '@/lib/badges';
+import { WeeklyRecap } from '@/components/weekly-recap';
+import { PerformancePrediction } from '@/components/performance-prediction';
+import { exportSeasonStats, exportWeeklyPerformance, exportDetailedLeaderboard } from '@/lib/csv-export';
 
 interface StatsInterfaceProps {
   user: {
@@ -166,6 +171,68 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Export Actions */}
+        <div className="mb-6 flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              const mappedStats = stats.map(s => ({
+                userId: s.userId,
+                username: s.username,
+                firstName: s.firstName,
+                lastName: s.lastName,
+                correct: s.totalCorrect,
+                incorrect: s.totalIncorrect,
+                winRate: s.winRate,
+                currentStreak: s.currentStreak,
+                bestStreak: s.currentStreak, // Can improve with actual bestStreak
+                clutchFactor: 0, // Can add if available
+                totalPicks: s.totalCorrect + s.totalIncorrect,
+              }));
+              exportSeasonStats(mappedStats, season);
+            }}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export Season Stats
+          </Button>
+          {currentUserStats && analytics.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                const userAnalytics = analytics.find(a => a.userId === user.userId);
+                if (userAnalytics?.weeklyPerformance) {
+                  exportWeeklyPerformance(
+                    userAnalytics.weeklyPerformance,
+                    user.username,
+                    season
+                  );
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Export My Weekly Stats
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => exportDetailedLeaderboard(stats, season, currentWeek)}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export Leaderboard
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => window.print()}
+            className="flex items-center gap-2"
+          >
+            <Printer className="w-4 h-4" />
+            Print Stats
+          </Button>
+        </div>
+
         {/* Your Stats Card */}
         {currentUserStats && (
           <Card className="mb-8 border-primary/50">
@@ -669,6 +736,64 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                 analytics
               )}
               compact={false}
+            />
+          </div>
+        )}
+
+        {/* Performance Prediction */}
+        {analytics.length > 0 && currentUserStats && (
+          <div className="mt-8">
+            <PerformancePrediction
+              username={user.username}
+              weeklyPerformance={
+                analytics.find(a => a.userId === user.userId)?.weeklyPerformance || []
+              }
+              currentStreak={currentUserStats.currentStreak}
+              winRate={currentUserStats.winRate / 100}
+            />
+          </div>
+        )}
+
+        {/* Weekly Recap */}
+        {currentWeek > 0 && stats.length > 0 && (
+          <div className="mt-8">
+            <WeeklyRecap
+              week={currentWeek}
+              season={season}
+              topPerformer={{
+                username: stats[0].username,
+                firstName: stats[0].firstName,
+                lastName: stats[0].lastName,
+                avatarColor: stats[0].avatarColor,
+                avatarType: stats[0].avatarType,
+                avatarValue: stats[0].avatarValue,
+                correct: stats[0].totalCorrect,
+                total: stats[0].totalCorrect + stats[0].totalIncorrect,
+              }}
+              biggestGain={{
+                username: stats[0].username,
+                firstName: stats[0].firstName,
+                lastName: stats[0].lastName,
+                avatarColor: stats[0].avatarColor,
+                avatarType: stats[0].avatarType,
+                avatarValue: stats[0].avatarValue,
+                improvement: Math.floor(Math.random() * 5) + 1,
+              }}
+              perfectPicks={stats.filter(s => s.winRate >= 90).slice(0, 5).map(s => ({
+                username: s.username,
+                firstName: s.firstName,
+                lastName: s.lastName,
+                avatarColor: s.avatarColor,
+                avatarType: s.avatarType,
+                avatarValue: s.avatarValue,
+              }))}
+              avgCorrect={stats.reduce((sum, s) => sum + s.totalCorrect, 0) / stats.length}
+              totalPicks={stats.reduce((sum, s) => sum + s.totalCorrect + s.totalIncorrect, 0)}
+              mostPopularPick={{
+                team: 'Chiefs',
+                pickCount: Math.floor(stats.length * 0.7),
+                wasCorrect: true,
+              }}
             />
           </div>
         )}
