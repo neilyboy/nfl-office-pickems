@@ -46,10 +46,10 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState({
-    randomPicker: true,
-    upsetAlerts: true,
-    powerRankings: true,
-    matchupSimulator: true,
+    randomPicker: false,
+    upsetAlerts: false,
+    powerRankings: false,
+    matchupSimulator: false,
   });
   const [week, setWeek] = useState(0);
   const [currentWeek, setCurrentWeek] = useState(0);
@@ -63,7 +63,20 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
 
   useEffect(() => {
     fetchWeekGames();
+    fetchPermissions();
   }, [week]);
+
+  const fetchPermissions = async () => {
+    try {
+      const response = await fetch('/api/user/permissions');
+      const data = await response.json();
+      if (data.permissions) {
+        setPermissions(data.permissions);
+      }
+    } catch (error) {
+      console.error('Failed to fetch permissions:', error);
+    }
+  };
 
   useEffect(() => {
     if (lockTime) {
@@ -449,19 +462,21 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
         {!isLocked && week >= currentWeek && games.length > 0 && (
           <div className="mb-8 space-y-6">
             {/* Random Pick Generator */}
-            <RandomPickGenerator
-              games={games}
-              onPicksGenerated={(picksMap) => {
-                const newPicks: UserPick[] = [];
-                picksMap.forEach((teamId, gameId) => {
-                  newPicks.push({ gameId, pickedTeamId: teamId });
-                });
-                setPicks(newPicks);
-              }}
-            />
+            {permissions.randomPicker && (
+              <RandomPickGenerator
+                games={games}
+                onPicksGenerated={(picksMap) => {
+                  const newPicks: UserPick[] = [];
+                  picksMap.forEach((teamId, gameId) => {
+                    newPicks.push({ gameId, pickedTeamId: teamId });
+                  });
+                  setPicks(newPicks);
+                }}
+              />
+            )}
 
             {/* Upset Alerts */}
-            <UpsetAlerts games={games} />
+            {permissions.upsetAlerts && <UpsetAlerts games={games} />}
           </div>
         )}
 

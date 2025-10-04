@@ -7,7 +7,9 @@ import { getUserSession } from '@/lib/session';
  */
 export async function GET() {
   try {
-    const session = await getUserSession();
+    // Try to get regular user session
+    let session = await getUserSession();
+    
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
