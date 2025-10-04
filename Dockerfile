@@ -63,10 +63,14 @@ COPY --from=builder /app/postcss.config.mjs ./postcss.config.mjs
 # Create data directory for SQLite with proper permissions
 RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data && chmod 755 /app/data
 
+# Copy and setup entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 EXPOSE 3001
 ENV PORT 3001
 ENV HOSTNAME "0.0.0.0"
 ENV DATABASE_URL="file:/app/data/nfl-pickems.db"
 
-# Initialize database on first run and start app
-CMD ["/bin/sh", "-c", "chown -R nextjs:nodejs /app/data && chmod 777 /app/data && npx prisma db push --accept-data-loss && npm start"]
+# Use entrypoint script to initialize database and start app
+CMD ["/app/docker-entrypoint.sh"]
