@@ -465,17 +465,21 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
           
           // If there's a tie for winner, use tiebreaker to determine actual winner
           if (tiedForFirst.length > 1 && tbWinner) {
-            const actualWinner = scoresArray.find(s => s.user.id === tbWinner.userId);
+            // Only look among people tied for first
+            const actualWinner = tiedForFirst.find(s => s.user.id === tbWinner.userId);
             if (actualWinner) {
               winner = actualWinner;
+              console.log(`[LUNCH TRACKER] Week ${week}: Tiebreaker winner selected: ${winner.user.username}`);
             }
           }
           
           // If there's a tie for loser, use tiebreaker to determine actual loser
           if (tiedForLast.length > 1 && tbLoser) {
-            const actualLoser = scoresArray.find(s => s.user.id === tbLoser.userId);
+            // Only look among people tied for last
+            const actualLoser = tiedForLast.find(s => s.user.id === tbLoser.userId);
             if (actualLoser) {
               loser = actualLoser;
+              console.log(`[LUNCH TRACKER] Week ${week}: Tiebreaker loser selected: ${loser.user.username}`);
             }
           }
         }
