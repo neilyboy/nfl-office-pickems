@@ -478,6 +478,12 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
     
     console.log(`[LUNCH TRACKER] Week ${week}: Winner=${winner.user.username} (${winner.correct}/${winner.total}), Loser=${loser.user.username} (${loser.correct}/${loser.total})`);
     
+    // Skip if winner and loser are the same (only one person made picks or everyone tied)
+    if (winner.user.id === loser.user.id) {
+      console.log(`[LUNCH TRACKER] Week ${week}: Skipped - winner and loser are same person`);
+      return;
+    }
+    
     weeklyResults.set(week, {
       winner: {
         userId: winner.user.id,

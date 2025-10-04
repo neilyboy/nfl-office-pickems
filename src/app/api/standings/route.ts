@@ -232,6 +232,17 @@ export async function GET() {
             }
           }
 
+          // If winner and loser are the same (only one person made picks), don't count it
+          if (winner.user.id === loser.user.id) {
+            return {
+              week,
+              winner: null,
+              loser: null,
+              tiebreaker: null,
+              completed: true,
+            };
+          }
+
           return {
             week,
             winner: {
