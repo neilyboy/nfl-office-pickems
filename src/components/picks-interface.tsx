@@ -23,6 +23,8 @@ import { formatTime, getDayOfWeek } from '@/lib/utils';
 import { ESPNGame } from '@/lib/espn-api';
 import { getTeamLogoPath } from '@/lib/team-mappings';
 import Image from 'next/image';
+import { RandomPickGenerator } from '@/components/random-pick-generator';
+import { UpsetAlerts } from '@/components/upset-alerts';
 
 interface PicksInterfaceProps {
   user: {
@@ -436,6 +438,26 @@ export function PicksInterface({ user }: PicksInterfaceProps) {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Fun Extras - Only show for current/future weeks and not locked */}
+        {!isLocked && week >= currentWeek && games.length > 0 && (
+          <div className="mb-8 space-y-6">
+            {/* Random Pick Generator */}
+            <RandomPickGenerator
+              games={games}
+              onPicksGenerated={(picksMap) => {
+                const newPicks: UserPick[] = [];
+                picksMap.forEach((teamId, gameId) => {
+                  newPicks.push({ gameId, pickedTeamId: teamId });
+                });
+                setPicks(newPicks);
+              }}
+            />
+
+            {/* Upset Alerts */}
+            <UpsetAlerts games={games} />
+          </div>
         )}
 
         {/* Games by Day */}
