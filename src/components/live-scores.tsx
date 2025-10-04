@@ -149,14 +149,15 @@ export function LiveScores({ user }: LiveScoresProps) {
   }, [week]);
 
   useEffect(() => {
-    if (!autoRefresh) return;
+    // Only auto-refresh if enabled AND viewing current week
+    if (!autoRefresh || week !== currentWeek) return;
 
     const interval = setInterval(() => {
       fetchScores(true);
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [autoRefresh]);
+  }, [autoRefresh, week, currentWeek]);
   const fetchScores = async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);

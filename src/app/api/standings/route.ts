@@ -126,12 +126,18 @@ export async function GET() {
 
           scoresArray.sort((a, b) => b.correct - a.correct);
 
-          const winner = scoresArray[0];
-          const loser = scoresArray[scoresArray.length - 1];
+          let winner = scoresArray[0];
+          let loser = scoresArray[scoresArray.length - 1];
 
           // Calculate Monday tiebreaker if applicable
           let tiebreaker = null;
           const mondayGames = games.filter(g => getDayOfWeek(g.date) === 'Monday');
+          
+          // Check if we need tiebreaker (multiple users with same high/low score)
+          const topScore = scoresArray[0].correct;
+          const bottomScore = scoresArray[scoresArray.length - 1].correct;
+          const tiedForFirst = scoresArray.filter(s => s.correct === topScore);
+          const tiedForLast = scoresArray.filter(s => s.correct === bottomScore);
           
           if (mondayGames.length > 0 && mondayGames.every(g => g.status.type.state === 'post')) {
             let actualTotal = 0;
@@ -167,11 +173,34 @@ export async function GET() {
                 over: g.guess > actualTotal,
               }));
 
-              guessesWithDistance.sort((a, b) => a.distance - b.distance);
+              // Sort by distance, prefer under over over
+              guessesWithDistance.sort((a, b) => {
+                // If both under or both over, sort by distance
+                if (a.over === b.over) return a.distance - b.distance;
+                // Prefer under (not over) when distances are same
+                return a.over ? 1 : -1;
+              });
 
+              // Winner: closest without going over, or closest if all went over
               const notOverGuesses = guessesWithDistance.filter(g => !g.over);
               const tbWinner = notOverGuesses.length > 0 ? notOverGuesses[0] : guessesWithDistance[0];
               const tbLoser = guessesWithDistance[guessesWithDistance.length - 1];
+
+              // If there's a tie for winner, use tiebreaker to determine actual winner
+              if (tiedForFirst.length > 1 && tbWinner) {
+                const actualWinner = scoresArray.find(s => s.user.id === tbWinner.userId);
+                if (actualWinner) {
+                  winner = actualWinner;
+                }
+              }
+
+              // If there's a tie for loser, use tiebreaker to determine actual loser
+              if (tiedForLast.length > 1 && tbLoser) {
+                const actualLoser = scoresArray.find(s => s.user.id === tbLoser.userId);
+                if (actualLoser) {
+                  loser = actualLoser;
+                }
+              }
 
               tiebreaker = {
                 actualTotal,
