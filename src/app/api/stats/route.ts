@@ -452,6 +452,8 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
             return a.over ? 1 : -1;
           });
           
+          console.log(`[LUNCH TRACKER] Week ${week}: Tiebreaker - Actual: ${actualTotal}, Guesses: ${guessesWithDistance.map((g: any) => `${g.userId}:${g.guess}`).join(', ')}`);
+          
           // Winner: closest without going over, or closest if all went over
           const notOverGuesses = guessesWithDistance.filter((g: any) => !g.over);
           const tbWinner = notOverGuesses.length > 0 ? notOverGuesses[0] : guessesWithDistance[0];
