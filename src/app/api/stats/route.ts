@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getUserSession } from '@/lib/session';
 import { getCurrentWeek, getWeekGames } from '@/lib/espn-api';
+import { getDayOfWeek } from '@/lib/utils';
 
 /**
  * Calculate season highlights (Most Improved, Perfect Weeks, etc.)
@@ -396,8 +397,84 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
     
     scoresArray.sort((a, b) => b.correct - a.correct);
     
-    const winner = scoresArray[0];
-    const loser = scoresArray[scoresArray.length - 1];
+    let winner = scoresArray[0];
+    let loser = scoresArray[scoresArray.length - 1];
+    
+    // Check if we need tiebreaker (multiple users with same high/low score)
+    const topScore = scoresArray[0].correct;
+    const bottomScore = scoresArray[scoresArray.length - 1].correct;
+    const tiedForFirst = scoresArray.filter(s => s.correct === topScore);
+    const tiedForLast = scoresArray.filter(s => s.correct === bottomScore);
+    
+    // Apply Monday night tiebreaker if needed
+    if ((tiedForFirst.length > 1 || tiedForLast.length > 1)) {
+      const mondayGames = games.filter((g: any) => getDayOfWeek(g.date) === 'Monday');
+      
+      if (mondayGames.length > 0 && mondayGames.every((g: any) => g.status.type.state === 'post')) {
+        // Calculate actual total
+        let actualTotal = 0;
+        mondayGames.forEach((game: any) => {
+          const homeTeam = game.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
+          const awayTeam = game.competitions[0].competitors.find((c: any) => c.homeAway === 'away');
+          
+          if (homeTeam && awayTeam) {
+            const homeScore = parseInt(homeTeam.score) || 0;
+            const awayScore = parseInt(awayTeam.score) || 0;
+            actualTotal += homeScore + awayScore;
+          }
+        });
+        
+        // Get all guesses
+        const weekPicks = allPicks.filter((p: any) => p.week === week);
+        const guesses = weekPicks
+          .filter((p: any) => p.mondayNightGuess !== null)
+          .reduce((acc: any[], pick: any) => {
+            const existing = acc.find(g => g.userId === pick.userId);
+            if (!existing) {
+              acc.push({
+                userId: pick.userId,
+                guess: pick.mondayNightGuess!,
+              });
+            }
+            return acc;
+          }, []);
+        
+        if (guesses.length > 0) {
+          const guessesWithDistance = guesses.map((g: any) => ({
+            ...g,
+            distance: Math.abs(g.guess - actualTotal),
+            over: g.guess > actualTotal,
+          }));
+          
+          // Sort by distance, prefer under over over
+          guessesWithDistance.sort((a: any, b: any) => {
+            if (a.over === b.over) return a.distance - b.distance;
+            return a.over ? 1 : -1;
+          });
+          
+          // Winner: closest without going over, or closest if all went over
+          const notOverGuesses = guessesWithDistance.filter((g: any) => !g.over);
+          const tbWinner = notOverGuesses.length > 0 ? notOverGuesses[0] : guessesWithDistance[0];
+          const tbLoser = guessesWithDistance[guessesWithDistance.length - 1];
+          
+          // If there's a tie for winner, use tiebreaker to determine actual winner
+          if (tiedForFirst.length > 1 && tbWinner) {
+            const actualWinner = scoresArray.find(s => s.user.id === tbWinner.userId);
+            if (actualWinner) {
+              winner = actualWinner;
+            }
+          }
+          
+          // If there's a tie for loser, use tiebreaker to determine actual loser
+          if (tiedForLast.length > 1 && tbLoser) {
+            const actualLoser = scoresArray.find(s => s.user.id === tbLoser.userId);
+            if (actualLoser) {
+              loser = actualLoser;
+            }
+          }
+        }
+      }
+    }
     
     weeklyResults.set(week, {
       winner: {
