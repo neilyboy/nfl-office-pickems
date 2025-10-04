@@ -11,8 +11,10 @@ import {
   Database, 
   LogOut,
   Home,
-  ShieldCheck
+  ShieldCheck,
+  Settings
 } from 'lucide-react';
+import { FeaturePermissions } from '@/components/admin/feature-permissions';
 
 export function AdminDashboard() {
   const router = useRouter();
@@ -223,6 +225,20 @@ export function AdminDashboard() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Feature Permissions Section */}
+          <div className="mt-12">
+            <div className="mb-6 flex items-center gap-3">
+              <Settings className="w-6 h-6 text-primary" />
+              <div>
+                <h3 className="text-2xl font-bold">Feature Permissions</h3>
+                <p className="text-sm text-muted-foreground">
+                  Control which features are available and who can access them
+                </p>
+              </div>
+            </div>
+            <FeaturePermissions />
           </div>
         </div>
       </main>
