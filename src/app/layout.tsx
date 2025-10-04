@@ -1,14 +1,11 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InstallPrompt } from "@/components/install-prompt";
 import { NotificationManager } from '@/components/notification-manager';
 import { ThemeProvider } from '@/contexts/theme-context';
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "NFL Office Pickems",
@@ -51,7 +48,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="NFL Pickems" />
         <meta name="theme-color" content="#3b82f6" />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <ThemeProvider>
           <NotificationManager />
           {children}
