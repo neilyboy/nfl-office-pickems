@@ -25,6 +25,8 @@ import { BadgeDisplay } from '@/components/badge-display';
 import { calculateUserBadges } from '@/lib/badges';
 import { WeeklyRecap } from '@/components/weekly-recap';
 import { PerformancePrediction } from '@/components/performance-prediction';
+import { PowerRankings } from '@/components/power-rankings';
+import { MatchupSimulator } from '@/components/matchup-simulator';
 import { exportSeasonStats, exportWeeklyPerformance, exportDetailedLeaderboard } from '@/lib/csv-export';
 
 interface StatsInterfaceProps {
@@ -64,10 +66,29 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
   const [lunchTracker, setLunchTracker] = useState<any[]>([]);
   const [currentWeekProgress, setCurrentWeekProgress] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any[]>([]);
+  const [permissions, setPermissions] = useState({
+    randomPicker: false,
+    upsetAlerts: false,
+    powerRankings: false,
+    matchupSimulator: false,
+  });
 
   useEffect(() => {
     fetchStats();
+    fetchPermissions();
   }, []);
+
+  const fetchPermissions = async () => {
+    try {
+      const response = await fetch('/api/user/permissions');
+      const data = await response.json();
+      if (data.permissions) {
+        setPermissions(data.permissions);
+      }
+    } catch (error) {
+      console.error('Failed to fetch permissions:', error);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -794,6 +815,32 @@ export function StatsInterface({ user }: StatsInterfaceProps) {
                 pickCount: Math.floor(stats.length * 0.7),
                 wasCorrect: true,
               }}
+            />
+          </div>
+        )}
+
+        {/* Power Rankings */}
+        {permissions.powerRankings && stats.length > 0 && analytics.length > 0 && (
+          <div className="mt-8">
+            <PowerRankings stats={stats} analytics={analytics} />
+          </div>
+        )}
+
+        {/* Matchup Simulator */}
+        {permissions.matchupSimulator && stats.length > 0 && analytics.length > 0 && (
+          <div className="mt-8">
+            <MatchupSimulator
+              users={stats.map(s => ({
+                userId: s.userId,
+                username: s.username,
+                firstName: s.firstName,
+                lastName: s.lastName,
+                avatarColor: s.avatarColor,
+                avatarType: s.avatarType,
+                avatarValue: s.avatarValue,
+              }))}
+              stats={stats}
+              analytics={analytics}
             />
           </div>
         )}
