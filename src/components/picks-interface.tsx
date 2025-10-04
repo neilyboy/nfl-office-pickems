@@ -43,6 +43,7 @@ interface UserPick {
 
 export function PicksInterface({ user }: PicksInterfaceProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [permissions, setPermissions] = useState({
