@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getUserSession } from '@/lib/session';
+import { getAdminSession } from '@/lib/session';
 
 /**
  * GET - Get feature settings
  */
 export async function GET() {
   try {
-    const session = await getUserSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
     }
 
     // Get global feature settings
@@ -41,8 +41,8 @@ export async function GET() {
  */
 export async function PUT(request: Request) {
   try {
-    const session = await getUserSession();
-    if (!session || !session.isAdmin) {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
     }
 

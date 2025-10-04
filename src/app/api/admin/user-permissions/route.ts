@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getUserSession } from '@/lib/session';
+import { getAdminSession } from '@/lib/session';
 
 /**
  * GET - Get all users with their permissions
  */
 export async function GET() {
   try {
-    const session = await getUserSession();
-    if (!session || !session.isAdmin) {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
     }
 
@@ -40,8 +40,8 @@ export async function GET() {
  */
 export async function PUT(request: Request) {
   try {
-    const session = await getUserSession();
-    if (!session || !session.isAdmin) {
+    const isAdmin = await getAdminSession();
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
     }
 
