@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     const fileBuffer = await fs.readFile(backupPath);
 
     // Return file as download
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(fileBuffer as unknown as BodyInit, {
       headers: {
         'Content-Type': 'application/octet-stream',
         'Content-Disposition': `attachment; filename="${backup.filename}"`,

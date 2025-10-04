@@ -20,4 +20,8 @@ export function isValidUsername(username: string): boolean {
   return /^[a-zA-Z0-9_]{3,20}$/.test(username);
 }
 
+// Aliases for compatibility
+export const hashPassword = hashCredential;
+export const verifyPassword = verifyCredential;
+
 export const DEFAULT_PASSWORD = 'nflofficepickems';
