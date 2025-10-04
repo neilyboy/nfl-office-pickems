@@ -397,6 +397,8 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
     
     scoresArray.sort((a, b) => b.correct - a.correct);
     
+    console.log(`[LUNCH TRACKER] Week ${week}: Scores - ${scoresArray.map(s => `${s.user.username}:${s.correct}/${s.total}`).join(', ')}`);
+    
     let winner = scoresArray[0];
     let loser = scoresArray[scoresArray.length - 1];
     
@@ -405,6 +407,8 @@ function calculateLunchTracker(users: any[], allPicks: any[], gamesByWeek: Map<a
     const bottomScore = scoresArray[scoresArray.length - 1].correct;
     const tiedForFirst = scoresArray.filter(s => s.correct === topScore);
     const tiedForLast = scoresArray.filter(s => s.correct === bottomScore);
+    
+    console.log(`[LUNCH TRACKER] Week ${week}: TiedForFirst=${tiedForFirst.length} (${tiedForFirst.map(t => t.user.username).join(',')}), TiedForLast=${tiedForLast.length} (${tiedForLast.map(t => t.user.username).join(',')}))`);
     
     // Apply Monday night tiebreaker if needed
     if ((tiedForFirst.length > 1 || tiedForLast.length > 1)) {
