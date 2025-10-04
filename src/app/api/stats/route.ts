@@ -182,7 +182,10 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
     const weeklyPerformance = weeks.map(week => {
       const weekPicks = userPicks.filter(p => p.week === week);
       const games = gamesByWeek.get(week);
-      if (!games) return { week, correct: 0, total: 0 };
+      if (!games) {
+        console.log(`⚠️  User ${user.id} Week ${week}: No games found in gamesByWeek`);
+        return { week, correct: 0, total: 0 };
+      }
       
       let correct = 0;
       let total = 0;
@@ -197,6 +200,7 @@ function calculateAdvancedAnalytics(users: any[], allPicks: any[], gamesByWeek: 
         }
       });
       
+      console.log(`📈 User ${user.id} Week ${week}: ${correct}/${total} correct (${weekPicks.length} picks)`);
       return { week, correct, total };
     });
     
@@ -489,15 +493,23 @@ export async function GET() {
     
     // Fetch game results for each week
     const gamesByWeek = new Map();
+    console.log(`📊 Fetching games for weeks: ${weeks.join(', ')} in season ${season}`);
+    
     for (const week of weeks) {
       try {
         const games = await getWeekGames(week, season);
         gamesByWeek.set(week, games);
-        console.log(`Loaded ${games.length} games for Week ${week}`);
+        console.log(`✅ Week ${week}: Loaded ${games.length} games`);
+        
+        // Log completed games
+        const completedGames = games.filter(g => g.status.type.state === 'post');
+        console.log(`   - ${completedGames.length} completed games`);
       } catch (error) {
-        console.error(`Failed to load games for week ${week}:`, error);
+        console.error(`❌ Failed to load games for week ${week}:`, error);
       }
     }
+    
+    console.log(`📦 Total weeks with game data: ${gamesByWeek.size}`);
 
     // Helper function to check if a pick was correct
     const isPickCorrect = (pick: any, games: any[]): boolean | null => {
