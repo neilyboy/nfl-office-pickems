@@ -30,20 +30,49 @@ function calculateTrend(performance: Array<{ correct: number; total: number }>) 
   const recent = performance.slice(-3);
   const older = performance.slice(-6, -3);
   
-  if (older.length === 0) return 0;
+  if (older.length === 0 || recent.length === 0) return 0;
   
-  const recentAvg = recent.reduce((sum, w) => sum + (w.correct / w.total), 0) / recent.length;
-  const olderAvg = older.reduce((sum, w) => sum + (w.correct / w.total), 0) / older.length;
+  const recentAvg = recent.reduce((sum, w) => {
+    const rate = w.total > 0 ? w.correct / w.total : 0;
+    return sum + rate;
+  }, 0) / recent.length;
+  
+  const olderAvg = older.reduce((sum, w) => {
+    const rate = w.total > 0 ? w.correct / w.total : 0;
+    return sum + rate;
+  }, 0) / older.length;
   
   return recentAvg - olderAvg;
 }
 
 function predictNextWeek(performance: Array<{ correct: number; total: number }>, winRate: number, streak: number) {
-  if (performance.length === 0) return { low: 5, mid: 6, high: 8 };
+  // If no data, use win rate only
+  if (performance.length === 0 || !winRate) {
+    const baseMid = winRate ? Math.round(winRate * 10) : 6;
+    return { 
+      low: Math.max(0, baseMid - 2), 
+      mid: baseMid, 
+      high: Math.min(10, baseMid + 2) 
+    };
+  }
   
   const trend = calculateTrend(performance);
   const recentPerf = performance.slice(-3);
-  const recentAvg = recentPerf.reduce((sum, w) => sum + (w.correct / w.total), 0) / recentPerf.length;
+  
+  // Handle empty recent performance
+  if (recentPerf.length === 0) {
+    const baseMid = Math.round(winRate * 10);
+    return { 
+      low: Math.max(0, baseMid - 2), 
+      mid: baseMid, 
+      high: Math.min(10, baseMid + 2) 
+    };
+  }
+  
+  const recentAvg = recentPerf.reduce((sum, w) => {
+    const rate = w.total > 0 ? w.correct / w.total : 0;
+    return sum + rate;
+  }, 0) / recentPerf.length;
   
   // Base prediction on recent average
   let basePrediction = recentAvg * 10;
@@ -55,11 +84,12 @@ function predictNextWeek(performance: Array<{ correct: number; total: number }>,
   if (streak > 0) basePrediction += Math.min(streak * 0.2, 1);
   if (streak < 0) basePrediction -= Math.min(Math.abs(streak) * 0.2, 1);
   
-  // Adjust for overall win rate
-  basePrediction = (basePrediction * 0.7) + (winRate * 10 * 0.3);
+  // Adjust for overall win rate (prevent NaN)
+  const safeWinRate = winRate || 0;
+  basePrediction = (basePrediction * 0.7) + (safeWinRate * 10 * 0.3);
   
-  // Calculate range
-  const mid = Math.max(0, Math.min(10, Math.round(basePrediction)));
+  // Calculate range with safety checks
+  const mid = Math.max(0, Math.min(10, Math.round(basePrediction || 6)));
   const low = Math.max(0, mid - 2);
   const high = Math.min(10, mid + 2);
   
@@ -70,10 +100,15 @@ function getConfidence(performance: Array<{ correct: number; total: number }>, w
   if (performance.length < 3) return 'Low';
   
   const recentPerf = performance.slice(-5);
+  if (recentPerf.length === 0) return 'Low';
+  
   const variance = recentPerf.reduce((sum, w) => {
-    const rate = w.correct / w.total;
-    return sum + Math.pow(rate - winRate, 2);
+    const rate = w.total > 0 ? w.correct / w.total : 0;
+    return sum + Math.pow(rate - (winRate || 0), 2);
   }, 0) / recentPerf.length;
+  
+  // Handle NaN variance
+  if (isNaN(variance)) return 'Low';
   
   if (variance < 0.03) return 'Very High';
   if (variance < 0.06) return 'High';
