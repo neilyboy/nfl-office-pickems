@@ -1,18 +1,17 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { InstallPrompt } from "@/components/install-prompt";
-import { ThemeProvider } from "@/contexts/theme-context";
+import { NotificationManager } from '@/components/notification-manager';
+import { ThemeProvider } from '@/contexts/theme-context';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "NFL Office Pickems",
-  description: "Weekly NFL pickems for the office - Make picks, track stats, compete with friends!",
   manifest: "/manifest.json",
   themeColor: "#3b82f6",
   appleWebApp: {
@@ -54,6 +53,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
+          <NotificationManager />
           {children}
           <Toaster />
           <InstallPrompt />

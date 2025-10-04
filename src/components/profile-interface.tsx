@@ -15,13 +15,13 @@ import {
   Lock,
   Palette,
   Trophy,
-  LogOut,
   Save
 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { BadgeDisplay } from '@/components/badge-display';
 import { calculateUserBadges } from '@/lib/badges';
-import { ThemeSelector } from '@/components/theme-selector';
+import { ThemeSelector } from './theme-selector';
+import { NotificationPrompt } from './notification-prompt';
 
 interface ProfileInterfaceProps {
   user: {
@@ -522,6 +522,19 @@ export function ProfileInterface({ user }: ProfileInterfaceProps) {
               >
                 {saving ? 'Changing...' : 'Change Password'}
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Notification Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>🔔 Notifications</CardTitle>
+              <CardDescription>
+                Manage alerts and reminders
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NotificationPrompt />
             </CardContent>
           </Card>
 
