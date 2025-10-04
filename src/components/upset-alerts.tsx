@@ -161,7 +161,7 @@ export function UpsetAlerts({ games }: UpsetAlertsProps) {
           <Badge variant="secondary" className="ml-auto">
             {upsetPredictions.length} potential upset{upsetPredictions.length !== 1 ? 's' : ''}
           </Badge>
-        </CardHeader>
+        </div>
         <CardDescription>
           Games where the underdog might pull off a surprise!
         </CardDescription>
