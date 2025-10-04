@@ -9,4 +9,8 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/data/nfl-pickems.db
       - TZ=America/Chicago
+      # Cookie Security (auto-detects HTTPS from reverse proxy)
+      # - FORCE_SECURE_COOKIES=true   # Force secure cookies (for HTTPS)
+      # - FORCE_SECURE_COOKIES=false  # Force insecure cookies (for HTTP)
+      # Leave unset to auto-detect based on X-Forwarded-Proto header
     restart: unless-stopped

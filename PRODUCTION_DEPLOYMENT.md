@@ -129,6 +129,37 @@ environment:
   - TZ=America/New_York  # Or your timezone
 ```
 
+### **Cookie Security (HTTP vs HTTPS)**
+
+The app automatically detects if you're using HTTPS via a reverse proxy!
+
+**Default Behavior (Recommended):**
+- Leave `FORCE_SECURE_COOKIES` unset
+- Automatically uses secure cookies when accessed via HTTPS
+- Automatically uses regular cookies when accessed via HTTP
+- Works perfectly with Nginx Proxy Manager, Traefik, Caddy, etc.
+
+**Manual Override (Optional):**
+
+Edit `docker-compose.yml`:
+
+```yaml
+environment:
+  # Force secure cookies (only if you have issues with auto-detection)
+  - FORCE_SECURE_COOKIES=true   # Force HTTPS cookies
+  # OR
+  - FORCE_SECURE_COOKIES=false  # Force HTTP cookies
+```
+
+**When to use manual override:**
+- Your reverse proxy doesn't set `X-Forwarded-Proto` header
+- You want to force a specific mode for testing
+
+**Your Use Case (Nginx Proxy Manager):**
+- ✅ **No configuration needed!**
+- NPM automatically sets `X-Forwarded-Proto: https`
+- App will detect HTTPS and use secure cookies automatically
+
 ### **Database Path**
 
 By default, database is at `./data/nfl-pickems.db`. To change:
