@@ -15,7 +15,7 @@ export async function setUserSession(session: Session) {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, JSON.stringify(session), {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Set to true when using HTTPS
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });
@@ -43,7 +43,7 @@ export async function setAdminSession() {
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_COOKIE_NAME, 'true', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Set to true when using HTTPS
     sameSite: 'lax',
     maxAge: 60 * 60 * 2, // 2 hours
   });
