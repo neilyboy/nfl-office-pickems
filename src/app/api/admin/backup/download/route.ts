@@ -4,7 +4,11 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { prisma } from '@/lib/db';
 
-const DATA_DIR = path.join(process.cwd(), 'prisma', 'data');
+// Check if running in Docker (DATABASE_URL points to /app/data)
+const isDarwin = process.env.DATABASE_URL?.includes('/app/data');
+const DATA_DIR = isDarwin 
+  ? '/app/data'  // Docker path
+  : path.join(process.cwd(), 'prisma', 'data'); // Dev path
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 
 /**
