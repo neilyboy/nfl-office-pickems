@@ -50,15 +50,18 @@ async function shouldUseSecureCookies(): Promise<boolean> {
   return false;
 }
 
-export async function setUserSession(session: Session) {
+export async function setUserSession(session: Session, rememberMe: boolean = false) {
   const cookieStore = await cookies();
   const useSecure = await shouldUseSecureCookies();
+  
+  // If rememberMe is true, extend session to 30 days, otherwise 7 days
+  const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7;
   
   cookieStore.set(SESSION_COOKIE_NAME, JSON.stringify(session), {
     httpOnly: true,
     secure: useSecure,
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge,
   });
 }
 

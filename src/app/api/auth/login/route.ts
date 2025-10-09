@@ -8,7 +8,7 @@ import { setUserSession } from '@/lib/session';
  */
 export async function POST(request: Request) {
   try {
-    const { username, password } = await request.json();
+    const { username, password, rememberMe } = await request.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -39,13 +39,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Set user session
+    // Set user session with rememberMe option
     await setUserSession({
       userId: user.id,
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
-    });
+    }, rememberMe || false);
 
     return NextResponse.json({
       success: true,
