@@ -46,6 +46,11 @@ export async function GET(request: Request) {
     // Get user's picks
     const userPicks = allPicks.filter(p => p.userId === session.userId);
 
+    // Check if first game of the week has started
+    const firstGameStarted = games.some(g => 
+      g.status.type.state === 'in' || g.status.type.state === 'post'
+    );
+
     // Add user pick and total picks to each game
     const gamesWithPicks = games.map(game => {
       const userPick = userPicks.find(p => p.gameId === game.id);
@@ -54,30 +59,35 @@ export async function GET(request: Request) {
       const homeTeam = game.competitions[0].competitors.find(c => c.homeAway === 'home');
       const awayTeam = game.competitions[0].competitors.find(c => c.homeAway === 'away');
 
-      // Get users who picked each team
-      const homePickers = gamePicks
-        .filter(p => p.pickedTeamId === homeTeam?.team.id)
-        .map(p => ({
-          userId: p.user.id,
-          username: p.user.username,
-          firstName: p.user.firstName,
-          lastName: p.user.lastName,
-          avatarColor: p.user.avatarColor,
-          avatarType: p.user.avatarType,
-          avatarValue: p.user.avatarValue,
-        }));
+      // Get users who picked each team (only show after first game starts)
+      let homePickers: any[] = [];
+      let awayPickers: any[] = [];
+      
+      if (firstGameStarted) {
+        homePickers = gamePicks
+          .filter(p => p.pickedTeamId === homeTeam?.team.id)
+          .map(p => ({
+            userId: p.user.id,
+            username: p.user.username,
+            firstName: p.user.firstName,
+            lastName: p.user.lastName,
+            avatarColor: p.user.avatarColor,
+            avatarType: p.user.avatarType,
+            avatarValue: p.user.avatarValue,
+          }));
 
-      const awayPickers = gamePicks
-        .filter(p => p.pickedTeamId === awayTeam?.team.id)
-        .map(p => ({
-          userId: p.user.id,
-          username: p.user.username,
-          firstName: p.user.firstName,
-          lastName: p.user.lastName,
-          avatarColor: p.user.avatarColor,
-          avatarType: p.user.avatarType,
-          avatarValue: p.user.avatarValue,
-        }));
+        awayPickers = gamePicks
+          .filter(p => p.pickedTeamId === awayTeam?.team.id)
+          .map(p => ({
+            userId: p.user.id,
+            username: p.user.username,
+            firstName: p.user.firstName,
+            lastName: p.user.lastName,
+            avatarColor: p.user.avatarColor,
+            avatarType: p.user.avatarType,
+            avatarValue: p.user.avatarValue,
+          }));
+      }
 
       return {
         ...game,
@@ -90,6 +100,7 @@ export async function GET(request: Request) {
           home: homePickers,
           away: awayPickers,
         },
+        picksLocked: firstGameStarted, // Indicate if picks are visible
       };
     });
 
